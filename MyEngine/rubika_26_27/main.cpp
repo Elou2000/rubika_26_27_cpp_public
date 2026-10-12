@@ -6,11 +6,21 @@
 #include <Profiler.h>
 #include <Logger.h>
 #include <DebugMgr.h>
+#include "SceneMgr.h"
 
 int main()
 {
     gData.Init();
-
+    SceneMgr sceneMgr = SceneMgr();
+    sceneMgr.AddNewScene(new Scene("Scene 1"));
+    sceneMgr.AddNewScene(new Scene("Scene 2"));
+    sceneMgr.AddNewScene(new Scene("Scene 3"));
+    sceneMgr.AddNewScene(new Scene("Scene 4"));
+    sceneMgr.AddNewScene(new Scene("Scene 5"));
+    sceneMgr.AddNewScene(new Scene("Scene 6"));
+    sceneMgr.AddNewScene(new Scene("Scene 7"));
+    sceneMgr.AddNewScene(new Scene("Scene 8"));
+   
     sf::RenderWindow window(sf::VideoMode({ 1080, 720 }), "SFML works!", sf::State::Windowed);
 
     ImGui::SFML::Init(window);
@@ -52,6 +62,7 @@ int main()
         PROFILER_EVENT_BEGIN(PROFILER_COLOR_RED, "Update");
 #ifdef _USE_IMGUI
         ImGui::SFML::Update(window, imGuiTime);
+        sceneMgr.DrawDebug();
 #endif
 
         // sample
@@ -66,6 +77,7 @@ int main()
 
 #ifdef _USE_IMGUI
         ImGui::SFML::Render(window);
+       
 #endif
         window.display();
 

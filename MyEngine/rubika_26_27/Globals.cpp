@@ -9,6 +9,7 @@ Globals::Globals() : FrameCount(0)
 {
 	DebugMgr = new ::DebugMgr();
 	Logger = new ::Logger();
+	
 }
 
 Globals::~Globals()
