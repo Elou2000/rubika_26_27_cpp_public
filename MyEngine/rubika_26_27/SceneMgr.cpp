@@ -1,9 +1,20 @@
 #include "SceneMgr.h"
 #include "Logger.h"
+#include "Globals.h"
 
 #ifdef _USE_IMGUI
 #include <Imgui/imgui.h>
 #endif
+
+SceneMgr::SceneMgr()
+{
+	gData.DebugMgr->RegisterDebugableWindow("SceneMgr", this);
+}
+
+SceneMgr::~SceneMgr()
+{
+	gData.DebugMgr->UnregisterDebugableWindow("SceneMgr");
+}
 
 void SceneMgr::Start()
 {
@@ -59,6 +70,18 @@ void SceneMgr::DrawDebug()
 
 	if (currentMode == Navigate)
 	{
+		if (sceneList.empty() || currentScene == nullptr)
+		{
+			ImGui::Text("No scenes available.");
+
+			if (ImGui::Button("Add New Scene"))
+			{
+				AddNewScene(new Scene("Scene " + std::to_string(sceneList.size() + 1)));
+			}
+
+			return;
+		}
+
 		ImGui::TextColored(ImColor(255, 255, 255), "Active scene : %s", currentScene->sceneName.c_str());
 
 		if (ImGui::Button("Previous Scene"))
@@ -79,6 +102,7 @@ void SceneMgr::DrawDebug()
 
 		if (ImGui::Button("Select"))
 		{
+			if (sceneList.empty()) return;
 			currentScene = sceneList[currentCursorPos];
 		}
 
@@ -86,6 +110,7 @@ void SceneMgr::DrawDebug()
 
 		if (ImGui::Button("Inspect"))
 		{
+			if (sceneList.empty()) return;
 			currentInspectedScene = sceneList[currentCursorPos];
 			currentCursorPos = 0;
 			currentMode = Inspect;
@@ -169,18 +194,24 @@ void SceneMgr::DrawDebug()
 			}
 		}
 
-		for (auto entity : currentInspectedScene->entityList)
-		{
+		auto& entities = currentInspectedScene->entityList;
 
-			if (currentInspectedScene->entityList[currentCursorPos] == entity)
+		for (size_t i = 0; i < entities.size(); ++i)
+		{
+			Entity* entity = entities[i];
+
+			if (i == currentCursorPos)
 			{
-				ImGui::TextColored(ImColor(255, 0, 0), entity->entityName.c_str());
+				ImGui::TextColored(
+					ImColor(255, 0, 0),
+					"%s",
+					entity->entityName.c_str()
+				);
 			}
 			else
 			{
-				ImGui::Text(entity->entityName.c_str());
+				ImGui::Text("%s", entity->entityName.c_str());
 			}
-
 		}
 	
 

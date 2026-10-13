@@ -4,6 +4,11 @@
 
 #include <filesystem>
 #include <string>
+#include <unordered_map>
+#include <rapidxml/rapidxml.hpp>
+#include <rapidxml/rapidxml_utils.hpp>
+#include "DebugMgr.h"
+#include <globals.h>
 
 struct AnimationData
 {
@@ -29,34 +34,45 @@ struct StaticTileData
 	bool IsRevertedY = false;
 };
 
-struct TextureData
+struct TextureData 
 {
 	TextureData();
 	~TextureData();
 
 	sf::Texture Texture;
-	// Container of AnimationData AnimationsData;
-	// Container of StaticTileData StaticTilesData;
+	std::unordered_map<std::string, AnimationData> animationsData;
+	std::unordered_map<std::string, StaticTileData> staticTilesData;
+
 
 	friend class TextureMgr;
 };
 
-class TextureMgr final
+class TextureMgr : IDebugable
 {
 public:
+	TextureMgr();
+	~TextureMgr();
 	void Init();
 	void Shut();
 
-	/*
-	 * Loads the texture using the given path, including its metadata.
-	 * Obviously, this function will also store the loaded data
-	 * If errors occur during the loading process, this function must return false.
-	 * Return true otherwise.
-	*/
 	bool LoadTexture(const std::filesystem::path& path);
-
-	/*
-	 * Returns the corresponding TextureData using the name of the texture. Returns the default TextureData in case of an unknown name
-	 */
 	const TextureData& GetTextureData(const std::string& name) const;
+	
+
+	bool ReadInt(const rapidxml::xml_node<>& parent, const char* name, int& out);
+	bool ReadBool(const rapidxml::xml_node<>& parent, const char* name, bool& out);
+	bool ReadName(const rapidxml::xml_node<>& node, std::string& out);
+
+	bool FileExists(const std::filesystem::path& path);
+	bool LoadMetaData(const std::filesystem::path& metaPath, TextureData& out);
+	bool LoadAnimations(const rapidxml::xml_node<>& root, TextureData& out);
+	bool LoadBackgrounds(const rapidxml::xml_node<>& root, TextureData& out);
+
+	virtual void DrawDebug() override;
+	
+	std::unordered_map<std::string, TextureData> m_textures;
+	TextureData m_defaultTexture;
+	
+	
 };
+

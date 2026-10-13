@@ -7,20 +7,17 @@
 #include <Logger.h>
 #include <DebugMgr.h>
 #include "SceneMgr.h"
+#include "TextureMgr.h"
 
 int main()
 {
     gData.Init();
-    SceneMgr sceneMgr = SceneMgr();
-    sceneMgr.AddNewScene(new Scene("Scene 1"));
-    sceneMgr.AddNewScene(new Scene("Scene 2"));
-    sceneMgr.AddNewScene(new Scene("Scene 3"));
-    sceneMgr.AddNewScene(new Scene("Scene 4"));
-    sceneMgr.AddNewScene(new Scene("Scene 5"));
-    sceneMgr.AddNewScene(new Scene("Scene 6"));
-    sceneMgr.AddNewScene(new Scene("Scene 7"));
-    sceneMgr.AddNewScene(new Scene("Scene 8"));
+    //gData.SceneMgr->AddNewScene(new Scene("test1"));
    
+    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\IsaacSprite.png");
+    //const sf::Texture texture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\IsaacSprite.png");
+    //sf::Sprite sprite(texture);
+    
     sf::RenderWindow window(sf::VideoMode({ 1080, 720 }), "SFML works!", sf::State::Windowed);
 
     ImGui::SFML::Init(window);
@@ -35,7 +32,7 @@ int main()
     while (window.isOpen())
     {
         gData.IncrementFrameCount();
-
+        
         PROFILER_EVENT_BEGIN(PROFILER_COLOR_BLACK, "Frame %llu", gData.FrameCount);
 
         int deltaTimeMicroS = clock.getElapsedTime().asMicroseconds();
@@ -62,13 +59,14 @@ int main()
         PROFILER_EVENT_BEGIN(PROFILER_COLOR_RED, "Update");
 #ifdef _USE_IMGUI
         ImGui::SFML::Update(window, imGuiTime);
-        sceneMgr.DrawDebug();
+       
 #endif
 
         // sample
         //ImGui::ShowDemoWindow();
         //Logger::DrawLogger();
         gData.DebugMgr->Draw();
+      
 
         PROFILER_EVENT_END();
 
@@ -79,6 +77,7 @@ int main()
         ImGui::SFML::Render(window);
        
 #endif
+      
         window.display();
 
         PROFILER_EVENT_END();

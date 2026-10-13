@@ -11,6 +11,8 @@ class SceneMgr : IDebugable
 public:
 	enum mode {Navigate, Inspect};
 
+	SceneMgr();
+	~SceneMgr();
 	std::vector<Scene*> sceneList;
 	Scene* currentScene;
 	int currentCursorPos = 0;
