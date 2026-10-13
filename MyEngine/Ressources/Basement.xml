@@ -1,0 +1,99 @@
+<Backgrounds>
+    <Tile Name="Corner_Top_Left">
+        <X>0</X>
+        <Y>0</Y>
+        <SizeX>52</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>0</RevertedX>
+        <RevertedY>0</RevertedY>
+    </Tile>
+        <Tile Name="Corner_Top_Right">
+        <X>0</X>
+        <Y>0</Y>
+        <SizeX>52</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>1</RevertedX>
+        <RevertedY>0</RevertedY>
+    </Tile>
+        <Tile Name="Corner_Bottom_Left">
+        <X>0</X>
+        <Y>0</Y>
+        <SizeX>52</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>0</RevertedX>
+        <RevertedY>1</RevertedY>
+    </Tile>
+        <Tile Name="Corner_Bottom_Right">
+        <X>0</X>
+        <Y>0</Y>
+        <SizeX>52</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>1</RevertedX>
+        <RevertedY>1</RevertedY>
+    </Tile>
+    <Tile Name="Wall_Classic_Up">
+        <X>52</X>
+        <Y>0</Y>
+        <SizeX>52</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>0</RevertedX>
+        <RevertedY>0</RevertedY>
+    </Tile>
+    <Tile Name="Wall_Classic_Down">
+        <X>52</X>
+        <Y>0</Y>
+        <SizeX>52</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>0</RevertedX>
+        <RevertedY>1</RevertedY>
+    </Tile>
+    <Tile Name="Wall_Classic_Left">
+        <X>0</X>
+        <Y>52</Y>
+        <SizeX>52</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>0</RevertedX>
+        <RevertedY>0</RevertedY>
+    </Tile>
+    <Tile Name="Wall_Classic_Right">
+        <X>0</X>
+        <Y>52</Y>
+        <SizeX>52</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>1</RevertedX>
+        <RevertedY>0</RevertedY>
+    </Tile>
+    <Tile Name="Ground_Line_Up">
+        <X>826</X>
+        <Y>99</Y>
+        <SizeX>572</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>0</RevertedX>
+        <RevertedY>0</RevertedY>
+    </Tile>
+        <Tile Name="Ground_Line_Mid_1">
+        <X>826</X>
+        <Y>151</Y>
+        <SizeX>572</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>0</RevertedX>
+        <RevertedY>0</RevertedY>
+    </Tile>
+        <Tile Name="Ground_Line_Mid_2">
+        <X>826</X>
+        <Y>203</Y>
+        <SizeX>572</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>0</RevertedX>
+        <RevertedY>0</RevertedY>
+    </Tile>
+        <Tile Name="Ground_Line_Down">
+        <X>826</X>
+        <Y>411</Y>
+        <SizeX>572</SizeX>
+        <SizeY>52</SizeY>
+        <RevertedX>0</RevertedX>
+        <RevertedY>0</RevertedY>
+    </Tile>
+
+</Backgrounds>
