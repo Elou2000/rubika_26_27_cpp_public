@@ -12,8 +12,7 @@ inline C* Entity::AddComponent()
 		return nullptr;
 	}
 	else
-	{
-		
+	{	
 		C* component = new C(*this);
 		Logger::Info("Added " + component->GetName());
 		components.emplace_back(component);

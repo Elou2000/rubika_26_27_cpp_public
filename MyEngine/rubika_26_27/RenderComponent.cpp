@@ -30,14 +30,22 @@ void RenderComponent::Update(float fDeltaTime)
 	}
 }
 
+
 void RenderComponent::Draw(sf::RenderWindow& window)
 {
+	const sf::Transform* matrix = nullptr;
+
+	if (auto* tc = GetEntity().GetComponent<TransformComponent>())
+		matrix = &tc->GetMatrix();
+
 	for (auto drawable : drawables)
 	{
-		drawable->Draw(window);
+		if (matrix)
+			drawable->SetWorldTransform(*matrix);
+
+		if (drawable->IsVisible())
+			drawable->Draw(window);
 	}
-
-
 }
 
 void RenderComponent::Destroy()
@@ -46,4 +54,15 @@ void RenderComponent::Destroy()
 	{
 		drawable->Destroy();
 	}
+}
+
+
+void RenderComponent::DrawDebug()
+{
+#ifdef _USE_IMGUI
+	ImGui::Text("Drawables : %zu", drawables.size());
+
+	if (ImGui::Button("Add StaticRectangle"))
+		AddDrawable<StaticRectangle>();
+#endif
 }

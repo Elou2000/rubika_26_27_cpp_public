@@ -13,6 +13,7 @@ public:
 	void Update(float fDeltaTime);
 	void Draw(sf::RenderWindow& window);
 	void Destroy();
+	void DrawDebug() override;
 
 	template <typename C>
 	C* AddDrawable();

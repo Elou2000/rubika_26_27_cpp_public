@@ -36,5 +36,5 @@ void IDrawable::Draw(sf::RenderWindow& window) const
 	sf::RenderStates states = sf::RenderStates::Default;
 	states.transform = WorldTransform;
 
-	window.draw(*Drawable);
+	window.draw(*Drawable, states);
 }

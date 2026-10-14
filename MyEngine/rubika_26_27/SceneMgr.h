@@ -9,7 +9,7 @@
 class SceneMgr : IDebugable
 {
 public:
-	enum mode {Navigate, Inspect};
+	enum mode {Navigate, InspectScene, InspectEntity};
 
 	SceneMgr();
 	~SceneMgr();
@@ -18,7 +18,8 @@ public:
 	int currentCursorPos = 0;
 
 	mode currentMode = Navigate;
-	Scene* currentInspectedScene;
+	Scene* currentInspectedScene = nullptr;
+	Entity* currentInspectedEntity = nullptr;
 
 	virtual void Start();
 	virtual void Update(float fDeltaTime);

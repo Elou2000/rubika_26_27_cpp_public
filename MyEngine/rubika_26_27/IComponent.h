@@ -2,6 +2,10 @@
 
 #include <string>
 
+#ifdef _USE_IMGUI
+#include <Imgui/imgui.h>
+#endif
+
 class Entity;
 
 class IComponent abstract
@@ -18,7 +22,7 @@ public:
 
 	virtual void Destroy() = 0;
 
-	//virtual void DrawDebug();
+	virtual void DrawDebug() = 0;
 
 	std::string GetName() const;
 

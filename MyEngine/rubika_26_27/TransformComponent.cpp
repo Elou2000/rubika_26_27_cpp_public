@@ -15,6 +15,30 @@ TransformComponent::TransformComponent(Entity& entity) : IComponent(entity)
 TransformComponent::~TransformComponent()
 {}
 
+void TransformComponent::DrawDebug()
+{
+#ifdef _USE_IMGUI
+	float pos[2] = { GetWorldPosition().x, GetWorldPosition().y};
+	if (ImGui::DragFloat2("Position", pos, 1.f))
+		SetWorldPosition(sf::Vector2(pos[0], pos[1]));
+
+	float rotation = GetRotation();
+	if (ImGui::DragFloat("Rotation", &rotation, 0.5f, -360.f, 360.f))
+		SetRotation(rotation);
+
+	float scl[2] = { GetScale().x, GetScale().y};
+	if (ImGui::DragFloat2("Scale", scl, 0.01f, 0.01f, 100.f))
+		SetScale(sf::Vector2(scl[0], scl[1]));
+
+	if (ImGui::Button("Reset"))
+	{
+		SetWorldPositionQuery(sf::Vector2(0.f, 0.f));
+		SetRotation(0.f);
+		SetScale(sf::Vector2(1.f, 1.f));
+	}
+#endif
+}
+
 const sf::Transform& TransformComponent::GetMatrix() const
 {
 	return Matrix;

@@ -113,7 +113,7 @@ void SceneMgr::DrawDebug()
 			if (sceneList.empty()) return;
 			currentInspectedScene = sceneList[currentCursorPos];
 			currentCursorPos = 0;
-			currentMode = Inspect;
+			currentMode = InspectScene;
 		
 		}
 
@@ -136,7 +136,7 @@ void SceneMgr::DrawDebug()
 
 		}
 	}
-	else if (currentMode == Inspect)
+	else if (currentMode == InspectScene)
 	{
 		if (currentInspectedScene == nullptr) return;
 		ImGui::TextColored(ImColor(255, 255, 255), "Currenly inspected scene : %s", currentInspectedScene->sceneName.c_str());
@@ -162,6 +162,18 @@ void SceneMgr::DrawDebug()
 			currentCursorPos = 0;
 			currentMode = Navigate;
 			currentInspectedScene = nullptr;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Inspect Entity"))
+		{
+			auto& ents = currentInspectedScene->entityList;
+			if (!ents.empty() && currentCursorPos < (int)ents.size())
+			{
+				currentInspectedEntity = ents[currentCursorPos];
+				currentMode = InspectEntity;
+			}
 		}
 
 		if (currentInspectedScene == nullptr) return;
@@ -216,6 +228,40 @@ void SceneMgr::DrawDebug()
 	
 
 	}
+	else if (currentMode == InspectEntity)
+	{
+		if (currentInspectedEntity == nullptr)
+		{
+			currentMode = InspectScene;
+			return;
+		}
+
+		ImGui::TextColored(ImColor(255, 255, 255), "Inspected entity : %s",
+			currentInspectedEntity->entityName.c_str());
+
+		if (ImGui::Button("Back to entities"))
+		{
+			currentInspectedEntity = nullptr;
+			currentMode = InspectScene;
+			return;
+		}
+
+		ImGui::Separator();
+
+		if (currentInspectedEntity->components.empty())
+			ImGui::Text("No components.");
+
+		for (auto component : currentInspectedEntity->components)
+		{
+			ImGui::PushID(component); 
+			if (ImGui::CollapsingHeader(component->GetName().c_str(),
+				ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				component->DrawDebug();
+			}
+			ImGui::PopID();
+		}
+		}
 	
 
 	
