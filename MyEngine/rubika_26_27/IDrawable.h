@@ -21,6 +21,7 @@ public:
 	void SetWorldTransform(const sf::Transform& transform);
 
 	void Draw(sf::RenderWindow& window) const;
+	virtual void DrawDebug();
 
 protected:
 	bool Visible;

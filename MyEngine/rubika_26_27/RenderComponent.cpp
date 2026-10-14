@@ -64,5 +64,25 @@ void RenderComponent::DrawDebug()
 
 	if (ImGui::Button("Add StaticRectangle"))
 		AddDrawable<StaticRectangle>();
+
+	ImGui::Separator();
+
+	if (drawables.empty())
+		ImGui::TextDisabled("No drawables.");
+
+	for (size_t i = 0; i < drawables.size(); ++i)
+	{
+		IDrawable* drawable = drawables[i];
+
+		ImGui::PushID(drawable);
+		std::string label = std::to_string(i) + " - " + typeid(*drawable).name();
+
+		if (ImGui::TreeNode(label.c_str()))
+		{
+			drawable->DrawDebug();
+			ImGui::TreePop();
+		}
+		ImGui::PopID();
+	}
 #endif
 }

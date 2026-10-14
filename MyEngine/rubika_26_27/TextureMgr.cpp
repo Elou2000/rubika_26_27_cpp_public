@@ -187,14 +187,35 @@ void TextureMgr::DrawDebug()
 {
 #ifdef _USE_IMGUI
 
+	ImGui::Text("Textures : %zu", m_textures.size());
+	ImGui::Separator();
+
+	if (m_textures.empty())
+		ImGui::TextDisabled("No textures loaded.");
+
+	auto Row = [](const char* label, const char* fmt, auto value)
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::TextDisabled("%s", label);
+			ImGui::TableNextColumn();
+			ImGui::Text(fmt, value);
+		};
+
+	const ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders;
+
 	for (const auto& texture : m_textures)
 	{
 		const std::string& name = texture.first;
 		const auto& data = texture.second;
 
-		if (ImGui::BeginCombo(("##" + name).c_str(), name.c_str()))
+		ImGui::PushID(name.c_str());
+
+		if (ImGui::CollapsingHeader(name.c_str()))
 		{
-			if (ImGui::BeginCombo(("##" + name + "Stat").c_str(), "Stats"))
+			ImGui::Indent();
+
+			if (ImGui::TreeNode("Stats"))
 			{
 				if (!data.animationsData.empty())
 				{
@@ -203,29 +224,24 @@ void TextureMgr::DrawDebug()
 						const std::string& animName = animationData.first;
 						const auto& anim = animationData.second;
 
-						if (ImGui::BeginTable("AnimationStats", 2))
+						if (ImGui::TreeNode(animName.c_str()))
 						{
-							ImGui::TableNextColumn();
-							if (ImGui::TreeNode(animName.c_str()))
+							if (ImGui::BeginTable("AnimationStats", 2, tableFlags))
 							{
-								ImGui::TableNextColumn();
-								ImGui::Text("StartX: %d", anim.StartX);
-								ImGui::Text("StartY: %d", anim.StartY);
-								ImGui::Text("SizeX: %d", anim.SizeX);
-								ImGui::Text("SizeY: %d", anim.SizeY);
-								ImGui::Text("OffsetX: %d", anim.OffsetX);
-								ImGui::Text("OffsetY: %d", anim.OffsetY);
-								ImGui::Text("AnimationSpriteCount: %d", anim.AnimationSpriteCount);
-								ImGui::Text("SpriteOnLine: %d", anim.SpriteOnLine);
-								ImGui::Text("IsReverted: %d", anim.IsReverted);
-								ImGui::Text("TimeBetweenAnimationInS: %d", anim.TimeBetweenAnimationInS);
-
-
-								ImGui::TreePop();
+								Row("StartX", "%d", anim.StartX);
+								Row("StartY", "%d", anim.StartY);
+								Row("SizeX", "%d", anim.SizeX);
+								Row("SizeY", "%d", anim.SizeY);
+								Row("OffsetX", "%d", anim.OffsetX);
+								Row("OffsetY", "%d", anim.OffsetY);
+								Row("Sprite count", "%d", anim.AnimationSpriteCount);
+								Row("Sprites on line", "%d", anim.SpriteOnLine);
+								Row("Reverted", "%s", anim.IsReverted ? "yes" : "no");
+								Row("Time between frames (s)", "%d", anim.TimeBetweenAnimationInS);
+								ImGui::EndTable();
 							}
-							ImGui::EndTable();
+							ImGui::TreePop();
 						}
-						
 					}
 				}
 				else if (!data.staticTilesData.empty())
@@ -235,44 +251,48 @@ void TextureMgr::DrawDebug()
 						const std::string& tileName = staticTileData.first;
 						const auto& tile = staticTileData.second;
 
-						if (ImGui::BeginTable("TileStats", 2))
+						if (ImGui::TreeNode(tileName.c_str()))
 						{
-							ImGui::TableNextColumn();
-							if (ImGui::TreeNode(tileName.c_str(), "Tiles"))
+							if (ImGui::BeginTable("TileStats", 2, tableFlags))
 							{
-								ImGui::TableNextColumn();
-								ImGui::Text("StartX: %d", tile.StartX);
-								ImGui::Text("StartY: %d", tile.StartY);
-								ImGui::Text("SizeX: %d", tile.SizeX);
-								ImGui::Text("SizeY: %d", tile.SizeY);
-								ImGui::Text("IsRevertedX: %d", tile.IsRevertedX);
-								ImGui::Text("IsRevertedY: %d", tile.IsRevertedY);
-
-								ImGui::TreePop();
+								Row("StartX", "%d", tile.StartX);
+								Row("StartY", "%d", tile.StartY);
+								Row("SizeX", "%d", tile.SizeX);
+								Row("SizeY", "%d", tile.SizeY);
+								Row("Reverted X", "%s", tile.IsRevertedX ? "yes" : "no");
+								Row("Reverted Y", "%s", tile.IsRevertedY ? "yes" : "no");
+								ImGui::EndTable();
 							}
-							ImGui::EndTable();
+							ImGui::TreePop();
 						}
-						
 					}
 				}
 				else
 				{
-					ImGui::Text("No stats available.");
+					ImGui::TextDisabled("No stats available.");
 				}
 
-				ImGui::EndCombo();
+				ImGui::TreePop();
 			}
 
-		
-			if (ImGui::BeginCombo(("##" + name + "Visual").c_str(), "Visual"))
+			if (ImGui::TreeNode("Visual"))
 			{
-				ImGui::Image(texture.second.Texture);
+				const sf::Vector2u size = data.Texture.getSize();
+				ImGui::TextDisabled("%u x %u", size.x, size.y);
 
-				ImGui::EndCombo();
+	
+				float width = (float)size.x;
+				float avail = ImGui::GetContentRegionAvail().x;
+				float scale = (width > avail && width > 0.f) ? avail / width : 1.f;
+
+				ImGui::Image(data.Texture, sf::Vector2f(size.x * scale, size.y * scale));
+				ImGui::TreePop();
 			}
 
-			ImGui::EndCombo();
+			ImGui::Unindent();
 		}
+
+		ImGui::PopID();
 	}
 
 #endif

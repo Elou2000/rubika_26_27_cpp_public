@@ -70,163 +70,106 @@ void SceneMgr::DrawDebug()
 
 	if (currentMode == Navigate)
 	{
+		ImGui::Text("Scenes");
+		ImGui::Separator();
+
 		if (sceneList.empty() || currentScene == nullptr)
 		{
-			ImGui::Text("No scenes available.");
-
-			if (ImGui::Button("Add New Scene"))
-			{
-				AddNewScene(new Scene("Scene " + std::to_string(sceneList.size() + 1)));
-			}
-
+			ImGui::TextDisabled("No scenes available.");
+			if (ImGui::Button("Add New Scene")) AddNewScene(new Scene("Scene " + std::to_string(sceneList.size() + 1)));
 			return;
 		}
 
-		ImGui::TextColored(ImColor(255, 255, 255), "Active scene : %s", currentScene->sceneName.c_str());
+		ImGui::Text("Active : %s", currentScene->sceneName.c_str());
+		ImGui::Spacing();
 
-		if (ImGui::Button("Previous Scene"))
-		{
-			if (sceneList.empty()) return;
+		if (ImGui::Button("Previous"))
 			currentCursorPos = (currentCursorPos - 1 + sceneList.size()) % sceneList.size();
-		}
-
 		ImGui::SameLine();
-
-		if (ImGui::Button("Next Scene"))
-		{
-			if (sceneList.empty()) return;
+		if (ImGui::Button("Next"))
 			currentCursorPos = (currentCursorPos + 1) % sceneList.size();
-		}
-
 		ImGui::SameLine();
-
 		if (ImGui::Button("Select"))
-		{
-			if (sceneList.empty()) return;
 			currentScene = sceneList[currentCursorPos];
-		}
-
 		ImGui::SameLine();
-
 		if (ImGui::Button("Inspect"))
 		{
-			if (sceneList.empty()) return;
 			currentInspectedScene = sceneList[currentCursorPos];
 			currentCursorPos = 0;
 			currentMode = InspectScene;
-		
+			return;
 		}
 
-		if (ImGui::Button("Add New Scene"))
+		if (ImGui::Button("Add New Scene")) AddNewScene(new Scene("Scene " + std::to_string(sceneList.size() + 1)));
+
+		ImGui::Separator();
+
+		for (size_t i = 0; i < sceneList.size(); ++i)
 		{
-			AddNewScene(new Scene("Scene " + std::to_string(sceneList.size() + 1)));
-		}
+			Scene* scene = sceneList[i];
+			std::string label = scene->sceneName + (scene == currentScene ? "  (active)" : "");
 
-		for (auto scene : sceneList)
-		{
-
-			if (sceneList[currentCursorPos] == scene)
-			{
-				ImGui::TextColored(ImColor(255, 0, 0), scene->sceneName.c_str());
-			}
-			else
-			{
-				ImGui::Text(scene->sceneName.c_str());
-			}
-
+			ImGui::PushID((int)i);
+			if (ImGui::Selectable(label.c_str(), (int)i == currentCursorPos))
+				currentCursorPos = (int)i;
+			ImGui::PopID();
 		}
 	}
 	else if (currentMode == InspectScene)
 	{
 		if (currentInspectedScene == nullptr) return;
-		ImGui::TextColored(ImColor(255, 255, 255), "Currenly inspected scene : %s", currentInspectedScene->sceneName.c_str());
 
-		if (ImGui::Button("Previous Entitie"))
-		{
-			if (currentInspectedScene->entityList.size() <= 0) return;
-			currentCursorPos = (currentCursorPos - 1 + currentInspectedScene->entityList.size()) % currentInspectedScene->entityList.size();
-		}
+		ImGui::Text("Scenes > %s", currentInspectedScene->sceneName.c_str());
+		ImGui::Separator();
 
+		auto& entities = currentInspectedScene->entityList;
+
+		if (ImGui::Button("Previous") && !entities.empty()) currentCursorPos = (currentCursorPos - 1 + entities.size()) % entities.size();
 		ImGui::SameLine();
-
-		if (ImGui::Button("Next Entities"))
-		{
-			if (currentInspectedScene->entityList.size() <= 0) return;
-			currentCursorPos = (currentCursorPos + 1) % currentInspectedScene->entityList.size();
-		}
-
+		if (ImGui::Button("Next") && !entities.empty()) currentCursorPos = (currentCursorPos + 1) % entities.size();
 		ImGui::SameLine();
-
-		if (ImGui::Button("Back to navigate"))
+		if (ImGui::Button("Inspect"))
+		{
+			if (!entities.empty() && currentCursorPos < (int)entities.size())
+			{
+				currentInspectedEntity = entities[currentCursorPos];
+				currentMode = InspectEntity;
+				return;
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Back"))
 		{
 			currentCursorPos = 0;
 			currentMode = Navigate;
 			currentInspectedScene = nullptr;
+			return;
 		}
 
+		if (ImGui::Button("Add Entity")) currentInspectedScene->AddEntityToPool(new Entity("Entity " + std::to_string(entities.size() + 1)));
 		ImGui::SameLine();
-
-		if (ImGui::Button("Inspect Entity"))
+		if (ImGui::Button("Remove Entity"))
 		{
-			auto& ents = currentInspectedScene->entityList;
-			if (!ents.empty() && currentCursorPos < (int)ents.size())
+			if (!entities.empty() && currentCursorPos < (int)entities.size())
 			{
-				currentInspectedEntity = ents[currentCursorPos];
-				currentMode = InspectEntity;
+				currentInspectedScene->RemoveEntityFromPool(entities[currentCursorPos]);
+
+				if (currentCursorPos >= (int)entities.size())
+					currentCursorPos = entities.empty() ? 0 : (int)entities.size() - 1;
 			}
 		}
 
-		if (currentInspectedScene == nullptr) return;
+		ImGui::Separator();
 
-		if (ImGui::Button("Add Entitie"))
-		{
-			std::string entityName = "Entity " + std::to_string(currentInspectedScene->entityList.size() + 1);
-			currentInspectedScene->AddEntityToPool(new Entity(entityName));
-		}
-		ImGui::SameLine();
-
-		if (ImGui::Button("Remove Entitie"))
-		{
-			auto& entities = currentInspectedScene->entityList;
-
-			if (!entities.empty() && currentCursorPos < entities.size())
-			{
-				Entity* entity = entities[currentCursorPos];
-
-				currentInspectedScene->RemoveEntityFromPool(entity);
-
-				if (entities.empty() || currentCursorPos == 0)
-				{
-					currentCursorPos = 0;
-				}
-				else if (currentCursorPos >= entities.size())
-				{
-					currentCursorPos = entities.size() - 1;
-				}
-			}
-		}
-
-		auto& entities = currentInspectedScene->entityList;
+		if (entities.empty()) ImGui::TextDisabled("No entities.");
 
 		for (size_t i = 0; i < entities.size(); ++i)
 		{
-			Entity* entity = entities[i];
-
-			if (i == currentCursorPos)
-			{
-				ImGui::TextColored(
-					ImColor(255, 0, 0),
-					"%s",
-					entity->entityName.c_str()
-				);
-			}
-			else
-			{
-				ImGui::Text("%s", entity->entityName.c_str());
-			}
+			ImGui::PushID((int)i);
+			if (ImGui::Selectable(entities[i]->entityName.c_str(), (int)i == currentCursorPos))
+				currentCursorPos = (int)i;
+			ImGui::PopID();
 		}
-	
-
 	}
 	else if (currentMode == InspectEntity)
 	{
@@ -236,35 +179,32 @@ void SceneMgr::DrawDebug()
 			return;
 		}
 
-		ImGui::TextColored(ImColor(255, 255, 255), "Inspected entity : %s",
+		ImGui::Text("Scenes > %s > %s",
+			currentInspectedScene ? currentInspectedScene->sceneName.c_str() : "?",
 			currentInspectedEntity->entityName.c_str());
+		ImGui::Separator();
 
-		if (ImGui::Button("Back to entities"))
+		if (ImGui::Button("Back"))
 		{
 			currentInspectedEntity = nullptr;
 			currentMode = InspectScene;
 			return;
 		}
 
-		ImGui::Separator();
+		ImGui::Spacing();
 
 		if (currentInspectedEntity->components.empty())
-			ImGui::Text("No components.");
+			ImGui::TextDisabled("No components.");
 
 		for (auto component : currentInspectedEntity->components)
 		{
-			ImGui::PushID(component); 
-			if (ImGui::CollapsingHeader(component->GetName().c_str(),
-				ImGuiTreeNodeFlags_DefaultOpen))
-			{
+			ImGui::PushID(component);
+			if (ImGui::CollapsingHeader(component->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 				component->DrawDebug();
-			}
 			ImGui::PopID();
 		}
-		}
-	
+	}
 
-	
 #endif
 }
 

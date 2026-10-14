@@ -1,4 +1,7 @@
 #include "IDrawable.h"
+#ifdef _USE_IMGUI
+#include <Imgui/imgui.h>
+#endif
 
 IDrawable::IDrawable() : Visible(true), WorldTransform(sf::Transform::Identity), Drawable(nullptr)
 {}
@@ -37,4 +40,16 @@ void IDrawable::Draw(sf::RenderWindow& window) const
 	states.transform = WorldTransform;
 
 	window.draw(*Drawable, states);
+}
+
+void IDrawable::DrawDebug()
+{
+#ifdef _USE_IMGUI
+	ImGui::Checkbox("Visible", &Visible);
+
+	const float* m = WorldTransform.getMatrix();
+	ImGui::Text("World position : %.1f, %.1f", m[12], m[13]);
+
+	ImGui::Text("Is drawable : %s", Drawable ? "yes" : "no");
+#endif
 }
