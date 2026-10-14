@@ -8,6 +8,8 @@
 #include <DebugMgr.h>
 #include "SceneMgr.h"
 #include "TextureMgr.h"
+#include "TransformComponent.h"
+#include "RenderComponent.h"
 
 int main()
 {
@@ -17,7 +19,12 @@ int main()
     gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\enemy_texture_5.png");
     gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\Basement.png");
   
-    
+    gData.SceneMgr->AddNewScene(new Scene("Base Scene"));
+    gData.SceneMgr->sceneList[0]->AddEntityToPool(new Entity("John Entity"));
+    gData.SceneMgr->sceneList[0]->entityList[0]->AddComponent<TransformComponent>();
+    gData.SceneMgr->sceneList[0]->entityList[0]->AddComponent<RenderComponent>();
+    gData.SceneMgr->sceneList[0]->entityList[0]->GetComponent<RenderComponent>()->AddDrawable<StaticRectangle>();
+
     sf::RenderWindow window(sf::VideoMode({ 1080, 720 }), "SFML works!", sf::State::Windowed);
 
     ImGui::SFML::Init(window);

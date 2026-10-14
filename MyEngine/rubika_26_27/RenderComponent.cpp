@@ -5,7 +5,8 @@
 
 RenderComponent::RenderComponent(Entity& entity) : IComponent(entity)
 {
-	rectangleDrawable = new StaticRectangle();
+	//rectangleDrawable = new StaticRectangle();
+	//AddDrawable<StaticRectangle>();
 }
 
 RenderComponent::~RenderComponent()
@@ -14,22 +15,35 @@ RenderComponent::~RenderComponent()
 
 void RenderComponent::Start() 
 {
-	rectangleDrawable->Start();
+	for (auto drawable : drawables)
+	{
+		drawable->Start();
+	}
+	
 }
 
 void RenderComponent::Update(float fDeltaTime)
 {
-	rectangleDrawable->Update(fDeltaTime);
+	for (auto drawable : drawables)
+	{
+		drawable->Update(fDeltaTime);
+	}
 }
 
 void RenderComponent::Draw(sf::RenderWindow& window)
 {
-	rectangleDrawable->Draw(window);
+	for (auto drawable : drawables)
+	{
+		drawable->Draw(window);
+	}
 
 
 }
 
 void RenderComponent::Destroy()
 {
-	rectangleDrawable->Destroy();
+	for (auto drawable : drawables)
+	{
+		drawable->Destroy();
+	}
 }

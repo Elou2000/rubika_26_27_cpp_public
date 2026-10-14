@@ -14,6 +14,14 @@ public:
 	void Draw(sf::RenderWindow& window);
 	void Destroy();
 
-	StaticRectangle* rectangleDrawable;
+	template <typename C>
+	C* AddDrawable();
+
+
+
+	std::vector<IDrawable*> drawables;
+	//StaticRectangle* rectangleDrawable;
 };
+
+#include "RenderComponent.hxx"
 

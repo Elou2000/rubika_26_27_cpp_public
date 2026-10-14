@@ -3,7 +3,7 @@
 #include <SFML/Graphics/Transform.hpp>
 #include "IComponent.h"
 
-class TransformComponent : IComponent
+class TransformComponent : public IComponent
 {
 public:
 	struct DecomposedData

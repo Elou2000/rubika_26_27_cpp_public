@@ -20,11 +20,21 @@ public:
 	virtual void Destroy();
 
 	std::string entityName;
-	TransformComponent* tc;
-	RenderComponent* rc;
-	/*
-	 * This function will be removed later, when the rendering system will be more robust. But for now, we need it here.
-	 * Function that will be called each frame to draw the entity
-	*/
+	std::vector<IComponent*> components;
+	//TransformComponent* tc;
+	//RenderComponent* rc;
+
+	template <typename C>
+	C* AddComponent();
+
+	template <typename C>
+	C* GetComponent() const;
+
+
 	void Draw(sf::RenderWindow& window) const;
+
 };
+
+#include "Entity.hxx"
+
+

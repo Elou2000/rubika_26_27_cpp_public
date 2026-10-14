@@ -18,6 +18,10 @@ public:
 
 	virtual void Destroy() = 0;
 
+	//virtual void DrawDebug();
+
+	std::string GetName() const;
+
 protected:
 	Entity& GetEntity() const { return ParentEntity; };
 

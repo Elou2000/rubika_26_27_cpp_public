@@ -243,10 +243,12 @@
     <ClInclude Include="..\Dependencies\include\rapidxml\rapidxml_utils.hpp" />
     <ClInclude Include="DebugMgr.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="Entity.hxx" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="IDrawable.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Profiler.h" />
+    <ClInclude Include="RenderComponent.hxx" />
     <ClInclude Include="StaticRectangle.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="Scene.h" />
