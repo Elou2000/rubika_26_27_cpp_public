@@ -1,7 +1,9 @@
 #pragma once
 #include "TransformComponent.h"
+#include "RenderComponent.h"
 #include <string>
 
+class RenderComponent;
 namespace sf
 {
 	class RenderWindow;
@@ -18,7 +20,8 @@ public:
 	virtual void Destroy();
 
 	std::string entityName;
-	TransformComponent tc;
+	TransformComponent* tc;
+	RenderComponent* rc;
 	/*
 	 * This function will be removed later, when the rendering system will be more robust. But for now, we need it here.
 	 * Function that will be called each frame to draw the entity

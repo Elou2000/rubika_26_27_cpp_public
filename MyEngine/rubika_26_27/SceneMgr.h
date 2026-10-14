@@ -22,8 +22,8 @@ public:
 
 	virtual void Start();
 	virtual void Update(float fDeltaTime);
+	virtual void Draw(sf::RenderWindow& window);
 	virtual void Destroy();
-
 	void AddNewScene(Scene*);
 	void SelectScene(std::string);
 

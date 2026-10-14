@@ -29,6 +29,14 @@ void Scene::Update(float dt)
 	}
 }
 
+void Scene::Draw(sf::RenderWindow& window) const
+{
+	for (auto entity : entityList)
+	{
+		entity->Draw(window);
+	}
+}
+
 void Scene::Destroy()
 {
 	for (auto entity : entityList)
@@ -40,6 +48,7 @@ void Scene::Destroy()
 void Scene::AddEntityToPool(Entity* entityToAdd)
 {
 	entityList.push_back(entityToAdd);
+	entityToAdd->Start();
 }
 
 void Scene::RemoveEntityFromPool(Entity* entityToRemove)

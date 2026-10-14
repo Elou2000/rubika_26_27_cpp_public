@@ -221,3 +221,11 @@ void SceneMgr::DrawDebug()
 	
 #endif
 }
+
+void SceneMgr::Draw(sf::RenderWindow& window)
+{
+	if (currentScene != nullptr)
+	{
+		currentScene->Draw(window);
+	}
+}

@@ -211,10 +211,15 @@
     <ClCompile Include="DebugMgr.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="IComponent.cpp" />
+    <ClCompile Include="IDrawable.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="StaticRectangle.cpp" />
+    <ClCompile Include="RenderComponent.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneMgr.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="TextureMgr.cpp" />
     <ClCompile Include="TransformComponent.cpp" />
   </ItemGroup>
@@ -239,10 +244,14 @@
     <ClInclude Include="DebugMgr.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="IDrawable.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Profiler.h" />
+    <ClInclude Include="StaticRectangle.h" />
+    <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneMgr.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="TextureMgr.h" />
     <ClInclude Include="TransformComponent.h" />
   </ItemGroup>

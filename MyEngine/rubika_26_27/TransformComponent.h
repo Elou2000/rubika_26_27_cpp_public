@@ -1,8 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics/Transform.hpp>
+#include "IComponent.h"
 
-class TransformComponent
+class TransformComponent : IComponent
 {
 public:
 	struct DecomposedData
@@ -12,7 +13,7 @@ public:
 		sf::Vector2f Scale;
 	};
 
-	TransformComponent();
+	TransformComponent(Entity& entity);
 	~TransformComponent();
 
 

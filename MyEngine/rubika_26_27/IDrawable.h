@@ -12,7 +12,7 @@ public:
 
 	virtual void Start() = 0;
 	virtual void Update(float deltaTime) = 0;
-	virtual void Destroy(float deltaTime) = 0;
+	virtual void Destroy() = 0;
 
 	bool IsVisible() const;
 	void SetVisibility(bool visible);

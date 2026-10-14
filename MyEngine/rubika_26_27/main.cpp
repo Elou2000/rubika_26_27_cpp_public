@@ -66,18 +66,18 @@ int main()
         //ImGui::ShowDemoWindow();
         //Logger::DrawLogger();
         gData.DebugMgr->Draw();
-      
+        
 
         PROFILER_EVENT_END();
 
         PROFILER_EVENT_BEGIN(PROFILER_COLOR_GREEN, "Draw");
         window.clear();
-
+        gData.SceneMgr->Draw(window);
 #ifdef _USE_IMGUI
         ImGui::SFML::Render(window);
        
 #endif
-      
+       
         window.display();
 
         PROFILER_EVENT_END();
