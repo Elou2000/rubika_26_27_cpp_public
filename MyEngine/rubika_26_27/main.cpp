@@ -33,7 +33,7 @@ void SetUpGame()
     //rectangle->SetTextureAndStaticTile("Basement", "Corner_Bottom_Left");
 
     Sprite* sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
-    sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Right");
+    sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Left");
 
 
 }

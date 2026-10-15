@@ -24,10 +24,17 @@ public:
 	void Draw(sf::RenderWindow& window) const;
 	virtual void DrawDebug();
 
+	void SetLocalOffset(sf::Vector2f newPosition);
+	sf::Vector2f GetLocalOffset() const;
 	const TextureData* textureData;
+
+	sf::Vector2f localOffset;
+	sf::Transform localMatrix;
 
 protected:
 	bool Visible;
 	sf::Transform WorldTransform;
 	sf::Drawable* Drawable; // Pointer to the SFML derived class defined in IDrawable's derived class
+
+	
 };

@@ -36,13 +36,15 @@ void RenderComponent::Update(float fDeltaTime)
 	{
 		matrix = &transformOwner->GetMatrix();
 	}
+	
 
+	
 	for (auto drawable : drawables)
 	{
 		drawable->Update(fDeltaTime);
 
-
-		if (matrix) drawable->SetWorldTransform(*matrix);
+		
+		if (matrix) drawable->SetWorldTransform(*matrix * drawable->localMatrix);
 
 		
 	}

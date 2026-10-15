@@ -2,6 +2,7 @@
 #ifdef _USE_IMGUI
 #include <Imgui/imgui.h>
 #endif
+#include "Logger.h"
 
 IDrawable::IDrawable() : Visible(true), WorldTransform(sf::Transform::Identity), Drawable(nullptr)
 {}
@@ -49,7 +50,20 @@ void IDrawable::DrawDebug()
 
 	const float* m = WorldTransform.getMatrix();
 	ImGui::Text("World position : %.1f, %.1f", m[12], m[13]);
-
+	float pos[2] = { localOffset.x, localOffset.y };
+	if (ImGui::DragFloat2("Position", pos, 1.f))
+		SetLocalOffset(sf::Vector2(pos[0], pos[1]));
 	ImGui::Text("Is drawable : %s", Drawable ? "yes" : "no");
 #endif
+}
+
+void IDrawable::SetLocalOffset(sf::Vector2f newPosition)
+{
+	localOffset = newPosition;
+	localMatrix.translate(localOffset);
+}
+
+sf::Vector2f IDrawable::GetLocalOffset() const
+{
+	return localOffset;
 }
