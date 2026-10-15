@@ -4,9 +4,6 @@ Scene::Scene(const std::string& name)
 {
 	sceneName = name;
 
-	//AddEntityToPool(new Entity("test1"));
-	//AddEntityToPool(new Entity("test2"));
-	//AddEntityToPool(new Entity("test3"));
 }
 
 Scene::~Scene()

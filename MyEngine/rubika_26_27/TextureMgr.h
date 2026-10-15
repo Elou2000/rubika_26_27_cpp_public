@@ -60,6 +60,7 @@ public:
 	
 
 	bool ReadInt(const rapidxml::xml_node<>& parent, const char* name, int& out);
+	bool ReadFloat(const rapidxml::xml_node<>& parent, const char* name, float& out);
 	bool ReadBool(const rapidxml::xml_node<>& parent, const char* name, bool& out);
 	bool ReadName(const rapidxml::xml_node<>& node, std::string& out);
 

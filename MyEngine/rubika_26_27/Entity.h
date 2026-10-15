@@ -21,15 +21,12 @@ public:
 
 	std::string entityName;
 	std::vector<IComponent*> components;
-	//TransformComponent* tc;
-	//RenderComponent* rc;
 
 	template <typename C>
 	C* AddComponent();
 
 	template <typename C>
 	C* GetComponent() const;
-
 
 	void Draw(sf::RenderWindow& window) const;
 

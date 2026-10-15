@@ -1,5 +1,6 @@
 #pragma once
 #include "IComponent.h"
+#include "TransformComponent.h"
 #include "StaticRectangle.h"
 
 
@@ -18,10 +19,9 @@ public:
 	template <typename C>
 	C* AddDrawable();
 
-
+	TransformComponent* transformOwner;
 
 	std::vector<IDrawable*> drawables;
-	//StaticRectangle* rectangleDrawable;
 };
 
 #include "RenderComponent.hxx"

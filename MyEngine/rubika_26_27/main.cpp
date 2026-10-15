@@ -10,20 +10,39 @@
 #include "TextureMgr.h"
 #include "TransformComponent.h"
 #include "RenderComponent.h"
+#include "Sprite.h"
+
+void SetUpGame()
+{
+    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\Basement.png");
+    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\Antonio_Belpaese.png");
+    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\enemy_texture_1.png");
+    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\enemy_texture_2.png");
+    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\enemy_texture_3.png");
+    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\enemy_texture_4.png");
+    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\enemy_texture_5.png");
+    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\IsaacSprite.png");
+
+    gData.SceneMgr->AddNewScene(new Scene("Base Scene"));
+    Entity* newEntity = new Entity("John Entity");
+    gData.SceneMgr->sceneList[0]->AddEntityToPool(newEntity);
+    newEntity->AddComponent<TransformComponent>();
+    newEntity->AddComponent<RenderComponent>();
+
+    //StaticRectangle* rectangle = newEntity->GetComponent<RenderComponent>()->AddDrawable<StaticRectangle>();
+    //rectangle->SetTextureAndStaticTile("Basement", "Corner_Bottom_Left");
+
+    Sprite* sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
+    sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Right");
+
+
+}
 
 int main()
 {
     gData.Init();
-   
-    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\IsaacSprite.png");
-    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\enemy_texture_5.png");
-    gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\Basement.png");
-  
-    gData.SceneMgr->AddNewScene(new Scene("Base Scene"));
-    gData.SceneMgr->sceneList[0]->AddEntityToPool(new Entity("John Entity"));
-    gData.SceneMgr->sceneList[0]->entityList[0]->AddComponent<TransformComponent>();
-    gData.SceneMgr->sceneList[0]->entityList[0]->AddComponent<RenderComponent>();
-    gData.SceneMgr->sceneList[0]->entityList[0]->GetComponent<RenderComponent>()->AddDrawable<StaticRectangle>();
+    SetUpGame();
+    
 
     sf::RenderWindow window(sf::VideoMode({ 1080, 720 }), "SFML works!", sf::State::Windowed);
 
@@ -79,6 +98,7 @@ int main()
 
         PROFILER_EVENT_BEGIN(PROFILER_COLOR_GREEN, "Draw");
         window.clear();
+        gData.SceneMgr->Update(fDeltaTimeS);
         gData.SceneMgr->Draw(window);
 #ifdef _USE_IMGUI
         ImGui::SFML::Render(window);
@@ -99,3 +119,4 @@ int main()
 
     return 0;
 }
+

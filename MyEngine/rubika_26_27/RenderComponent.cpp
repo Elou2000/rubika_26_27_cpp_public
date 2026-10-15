@@ -5,8 +5,7 @@
 
 RenderComponent::RenderComponent(Entity& entity) : IComponent(entity)
 {
-	//rectangleDrawable = new StaticRectangle();
-	//AddDrawable<StaticRectangle>();
+
 }
 
 RenderComponent::~RenderComponent()
@@ -24,25 +23,38 @@ void RenderComponent::Start()
 
 void RenderComponent::Update(float fDeltaTime)
 {
+	const sf::Transform* matrix = nullptr;
+	if (transformOwner == nullptr)
+	{
+		if (auto* tc = GetEntity().GetComponent<TransformComponent>())
+		{
+			matrix = &tc->GetMatrix();
+			transformOwner = tc;
+		}
+	}
+	else
+	{
+		matrix = &transformOwner->GetMatrix();
+	}
+
 	for (auto drawable : drawables)
 	{
 		drawable->Update(fDeltaTime);
+
+
+		if (matrix) drawable->SetWorldTransform(*matrix);
+
+		
 	}
 }
 
 
 void RenderComponent::Draw(sf::RenderWindow& window)
 {
-	const sf::Transform* matrix = nullptr;
-
-	if (auto* tc = GetEntity().GetComponent<TransformComponent>())
-		matrix = &tc->GetMatrix();
-
+	
 	for (auto drawable : drawables)
 	{
-		if (matrix)
-			drawable->SetWorldTransform(*matrix);
-
+		
 		if (drawable->IsVisible())
 			drawable->Draw(window);
 	}

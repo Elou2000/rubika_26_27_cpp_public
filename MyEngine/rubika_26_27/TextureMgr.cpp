@@ -68,6 +68,27 @@ bool TextureMgr::ReadName(const rapidxml::xml_node<>& node, std::string& out)
 	return true;
 }
 
+bool TextureMgr::ReadFloat(const rapidxml::xml_node<>& parent, const char* name, float& out)
+{
+	const rapidxml::xml_node<>* child = parent.first_node(name);
+	if (!child)
+	{
+		Logger::Warning(std::string("Missing <") + name + "> node");
+		return false;
+	}
+
+	try
+	{
+		out = std::stof(std::string(child->value(), child->value_size()));
+	}
+	catch (const std::exception&)
+	{
+		Logger::Warning(std::string("Invalid float in <") + name + ">");
+		return false;
+	}
+	return true;
+}
+
 bool TextureMgr::FileExists(const std::filesystem::path& path)
 {
 	return std::filesystem::is_regular_file(path) && std::filesystem::exists(path);
@@ -154,6 +175,7 @@ bool TextureMgr::LoadAnimations(const rapidxml::xml_node<>& root, TextureData& o
 		ReadInt(*n, "SpriteNum", d.AnimationSpriteCount);
 		ReadInt(*n, "SpritesOnLine", d.SpriteOnLine);
 		ReadBool(*n, "Reverted", d.IsReverted);
+		ReadFloat(*n, "TimeBetweenAnimation", d.TimeBetweenAnimationInS);
 
 		if (!out.animationsData.emplace(name, d).second)
 			Logger::Error("Duplicate animation name " + name + " keeping the first one");

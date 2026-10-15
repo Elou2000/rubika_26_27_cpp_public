@@ -173,5 +173,11 @@
     <ClInclude Include="StaticRectangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Entity.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderComponent.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

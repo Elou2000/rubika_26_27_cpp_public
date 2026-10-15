@@ -3,6 +3,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include "TextureMgr.h"
 
 class IDrawable abstract
 {
@@ -22,6 +23,8 @@ public:
 
 	void Draw(sf::RenderWindow& window) const;
 	virtual void DrawDebug();
+
+	const TextureData* textureData;
 
 protected:
 	bool Visible;
