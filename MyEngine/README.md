@@ -8,8 +8,10 @@ The purpose of this project is to implement a tiny 2D engine using SFML to pract
 
 1. [Threshold 0](#threshold-0)
 2. [Threshold 1](#threshold-1)
-2. [Threshold 2](#threshold-2)
-2. [Threshold 3](#threshold-3)
+3. [Threshold 2](#threshold-2)
+4. [Threshold 3](#threshold-3)
+5. [Threshold 4](#threshold-4)
+6. [Threshold 5](#threshold-5)
 
 ### Resources
 
@@ -224,17 +226,17 @@ If the treshold 1 and threshold 3 have been done right, you should see the recta
 ## Threshold 4
 
 Our entities now have a `TransformComponent` and a `RenderComponent` as members directly in the `Entity` class. However, this is an approach we cannot use anymore. Indeed, if we create new components, we do not add them to every entity. We want this to be done dynamically.
-Furthermore, we want a way to retrieve any component from an entity so hat it can be used somewhere else (for instance, the `RenderComponent` will use the `TransformComponent` to determine where it should draw its `Drawable`). That is the purpose of this threshold.
+Furthermore, we want a way to retrieve any component from an entity so that it can be used somewhere else (for instance, the `RenderComponent` will use the `TransformComponent` to determine where to draw its `Drawable`). That is the purpose of this threshold.
 
 ### Step 0
 
-The first step of this threshold is to remove the instances of `TransformComponent` and `RenderComponent` in the `Entity` class and to replace by a container of `IComponent`. Then, update the `Entity` class to use this container wherever necessary (life cycle functions...).
+The first step of this threshold is to remove the instances of `TransformComponent` and `RenderComponent` from the `Entity` class and to replace them with a container of `IComponent`. Then, update the `Entity` class to use this container wherever necessary (life cycle functions...).
 
 There is no straightforward way to test your implementation, so follow the instructions above and move on to the next step.
 
 ### Step 1
 
-We now need functions to add and get our components. Let's create a function to add a `TransformComponent`, another one to add a `RenderComponent` and two functions to get those components such as
+We now need functions to add and get our components. Let's create a function to add a `TransformComponent`, another one to add a `RenderComponent` and two functions to retrieve those components such as
 ```cpp
 TransformComponent* AddTransformComponent();
 RenderComponent* AddRenderComponent();
@@ -245,13 +247,13 @@ RenderComponent* GetRenderComponent() const;
 
 Here are some instructions :
 - Only one `TransformComponent` can be added to an entity. The same applies for the `RenderComponent` or any other `IComponent`
-- Those functions returns the pointer to the component added or `nullptr` it is impossible. In that case, don't hesistate to add logs...
+- Those functions return a pointer to the component added or `nullptr` it is impossible. In that case, don't hesitate to add logs...
 
-It is working very well but it is not future-proof. Indeed, this approach implies to add (at least) two new functions eah time we will create a new `IComponent`, even if the implementation is the same except for the type. It would be great to have a single function to add components that could be used with every `IComponent`.
+It works very well but it is not future-proof. Indeed, this approach implies to add (at least) two new functions each time we create a new `IComponent`, even if the implementation is the same except for the type. It would be great to have a single function for adding components that could be used with every `IComponent`.
 
 ### Step 2
 
-In this step, we will create templated functions to replace the ones we have created during the previous step. Replace their declaration in the header file by :
+In this step, we will create templated functions to replace the ones we have created during the previous step. Replace their declarations in the header file with :
 ```cpp
 template <typename C>
 C* AddComponent();
@@ -266,8 +268,8 @@ C* GetComponent() const;
 
 **hints:**
 - As we discussed in class, templated functions cannot be implemented in cpp. You have to define them in the same header as their declaration. A good way to do it, is to create `hxx` files that will be included at the end of your `.h` which defines those functions.
-- You will have to check about the type of stored `IComponent` to avoid duplicate. To do so, take a look at `typeid` and `dynanic_cast`
-- To avoid having, awful errors in your console because of template, it is a good habit to use static checks with your template to ensure the given type will work with your implementation. For instance, in your case we want C to inherit from `IComponent`. This check can be made using `static_assert` and `std::is_base_of` (and the `requires` keyword in C++20).
+- You will have to check the type of stored `IComponent` to avoid duplicate. To do so, take a look at `typeid` and `dynamic_cast`
+- To avoid having, awful errors in your console because of templates, it is a good habit to use static checks with your template to ensure the given type will work with your implementation. For instance, in your case we want C to inherit from `IComponent`. This check can be made using `static_assert` and `std::is_base_of` (and the `requires` keyword in C++20).
 
 ### Step 3
 
@@ -280,3 +282,53 @@ We now have a working ECS, it is time to use it (even if its components do nothi
 ### Step 5
 
 Add virtual method `DrawDebug` to your `IComponent` as well as a `GetName` method (which will returns the component name) to display our components inside the debug window. Those debugs shoudl allow you to visualize the data of your component and, if possible, modify them. For instance, it would be a good idea to modify the value of your transform component using the debug.
+
+## Threshold 5
+
+We finally have a way to add/get `IComponent`, add/get `IDrawable`, load textures and metadata. It is now time to implement the behavior of our `RenderComponent`, `Sprite` and `Rectangle` to draw and animate our shape at the right location. That is the purpose of this threshold.
+
+### Step 0
+
+Let's start with the easiest one : `Rectangle`. We need to add few methods to be able to right `StaticTileData` to draw.
+``` cpp
+bool SetTexture(const std::string& textureName);
+bool SetStaticTile(const std::string& staticTileName);
+bool SetTextureAndStaticTile(const std::string& textureName, const std::string& staticTileName);
+```
+
+Using those three functions, you should be able to retrieve the right `TextureData` and the right `StaticTileData` to use. Using the `StaticTileData`, you have the necessary information to draw the right rectangle inside the entire texture. Here is a small description about each member of the `StaticTileData` structure :
+- **StartX**, **StartY** : Coordinates of the top-left corner of the rectangle
+- **SizeX, SizeY**: Size of the rectangle
+- **IsRevertedX** : does the rectangle should be reverted using the X-axis
+- **IsRevertedY** : does the rectangle should be reverted using the Y-axis
+
+Because this is a static shape, you must update the rectangle only on changes our on start. Your update must be empty.
+
+### Step 1
+
+Remove every hard coded value from your `Entity`, `Scene` and `RenderComponent`. We will now use the regular flow of our engine. Update the main function (or a dedicated function) to add the following steps:
+- Load the right texture into the `TextureMgr`
+- Create a `Scene` through the `SceneMgr` and set is as active
+- Create `Entity` and add it to the active `Scene`
+- Add a `TransformComponent` to the `Entity`
+- Add a `RenderComponent` to the `Entity`
+- Add a `RectangleShape` to the `RenderComponent`
+- Set the right texture and static tile to the `RectangleShape`
+
+As this stage, this code should be sufficient to draw the right texture at the top left corner of the screen
+
+### Step 2
+
+The next step would be to move the `Rectangle` alongside the update of the `TransformComponent`. To do so, modify the `Update` function of your `RenderComponent` so that it update the `WorldPosition` of your `Drawable`. Futhermore, add the necessary to be able to add offset from the `TransformComponent` to the `IDrawable`.
+
+At this step, the `Rectangle` drawn at the top-left corner of the window should move accordingly to the `TransformComponent` update using the debug you have created last threshold.
+
+### Step 3
+
+It is now the time to impplement our `Sprite` component. Modify this class to be able to select the right `AnimationData` (as you did with the `RectangleShape` and the `StaticTileData`). Finally, update the `Update` function so it can draw and update the rectangle to draw inside the texture each frame.
+
+Modify the code you added in the main function to test the behavior of the `Sprite` class. The animation should be played automatically and loop.
+
+### Step 4
+
+Update the debugs you have created to reflect the real state of all your Threshold
