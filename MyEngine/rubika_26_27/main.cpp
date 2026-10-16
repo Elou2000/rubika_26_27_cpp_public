@@ -35,6 +35,9 @@ void SetUpGame()
     Sprite* sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
     sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Left");
 
+     sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
+    sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Right");
+
 
 }
 

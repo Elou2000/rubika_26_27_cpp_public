@@ -59,7 +59,9 @@ void IDrawable::DrawDebug()
 
 void IDrawable::SetLocalOffset(sf::Vector2f newPosition)
 {
+	
 	localOffset = newPosition;
+	localMatrix = sf::Transform::Identity;
 	localMatrix.translate(localOffset);
 }
 
