@@ -5,4 +5,8 @@ This repository is linked to the C/C++ lesson given to the 4GP class at Rubika b
 ## October 2026
 
 Creating a small game engine and implementing few core system from scratch.
-[More information here](./MyEngine/README.md)
+[More information here](./MyEngine/README_october.md)
+
+## November 2026
+Creating a small game engine and implementing few core system from scratch.
+[More information here](./MyEngine/README_november.md)
