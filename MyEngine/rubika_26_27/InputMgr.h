@@ -28,6 +28,12 @@ public:
 	void UnBindActionFromKey(sf::Keyboard::Key key, const std::string& actionName);
 
 private:
+	static const char* KeyToString(sf::Keyboard::Key key);
+
+
+	int DebugSelectedKey = 0;
+	int DebugSelectedAction = 0;
+	char DebugNewActionName[64] = "";
 	
 	std::unordered_map<std::size_t, InputAction> InputActions;
 	std::unordered_map<sf::Keyboard::Key, std::vector<InputAction*>> KeyBindings;
