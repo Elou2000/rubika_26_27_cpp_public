@@ -46,38 +46,6 @@ void InputMgr::Destroy()
 
 }
 
-namespace
-{
-	const std::vector<std::pair<std::string, sf::Keyboard::Key>>& GetDebugKeys()
-	{
-		static std::vector<std::pair<std::string, sf::Keyboard::Key>> keys;
-		if (keys.empty())
-		{
-			for (int i = 0; i < 26; ++i)
-				keys.push_back({ std::string(1, char('A' + i)), sf::Keyboard::Key(sf::Keyboard::A + i) });
-			for (int i = 0; i < 10; ++i)
-				keys.push_back({ "Num" + std::to_string(i), sf::Keyboard::Key(sf::Keyboard::Num0 + i) });
-			keys.push_back({ "Space",  sf::Keyboard::Space });
-			keys.push_back({ "Enter",  sf::Keyboard::Enter });
-			keys.push_back({ "Escape", sf::Keyboard::Escape });
-			keys.push_back({ "Tab",    sf::Keyboard::Tab });
-			keys.push_back({ "LShift", sf::Keyboard::LShift });
-			keys.push_back({ "LCtrl",  sf::Keyboard::LControl });
-			keys.push_back({ "Left",   sf::Keyboard::Left });
-			keys.push_back({ "Right",  sf::Keyboard::Right });
-			keys.push_back({ "Up",     sf::Keyboard::Up });
-			keys.push_back({ "Down",   sf::Keyboard::Down });
-		}
-		return keys;
-	}
-
-	const char* KeyName(sf::Keyboard::Key key)
-	{
-		for (const auto& k : GetDebugKeys())
-			if (k.second == key) return k.first.c_str();
-		return "Unknown";
-	}
-}
 
 
 void InputMgr::DrawDebug()
