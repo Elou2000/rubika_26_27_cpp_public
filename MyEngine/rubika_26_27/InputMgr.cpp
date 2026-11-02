@@ -21,32 +21,21 @@ void InputMgr::Start()
 
 void InputMgr::Update(float fDeltaTime)
 {
-	for (auto bindings : KeyBindings)
+	for (const auto& bindings : KeyBindings) 
 	{
-		if (sf::Keyboard::isKeyPressed(bindings.first))
+		const float value = sf::Keyboard::isKeyPressed(bindings.first) ? 1.f : 0.f;
+		for (auto* inputAction : bindings.second)
 		{
-			for (auto inputAction : bindings.second)
-			{
-				inputAction->SetValue(1);
-			}
+			inputAction->SetValue(value);
 		}
-		else
-		{
-			for (auto inputAction : bindings.second)
-			{
-				inputAction->SetValue(0);
-			}
-		}
+			
 	}
-	
 }
 
 void InputMgr::Destroy()
 {
 
 }
-
-
 
 void InputMgr::DrawDebug()
 {
@@ -68,7 +57,16 @@ void InputMgr::CreateInputAction(const std::string& name)
 void InputMgr::RemoveInputAction(const std::string& name)
 {
 	size_t hash = std::hash<std::string>{}(name);
-	InputActions.erase(hash);
+	auto it = InputActions.find(hash);
+	if (it == InputActions.end()) return;
+
+	InputAction* ptr = &it->second;
+	for (auto& pair : KeyBindings)
+	{
+		auto& v = pair.second;
+		v.erase(std::remove(v.begin(), v.end(), ptr), v.end());
+	}
+	InputActions.erase(it);
 }
 
 void InputMgr::RegisterToInputAction(const std::string& actionName, const std::string& debugName, std::function<void(float)> callback, void* owner)
@@ -85,28 +83,16 @@ void InputMgr::UnRegisterToInputAction(const std::string& actionName, void* owne
 
 void InputMgr::BindKeyToInputAction(sf::Keyboard::Key key, const std::string actionName)
 {
-	std::vector<InputAction*> action;
-	size_t hash = std::hash<std::string>{}(actionName);
-	auto it = InputActions.find(hash);
+	auto it = InputActions.find(std::hash<std::string>{}(actionName));
+	if (it == InputActions.end()) return;
 
-	if (KeyBindings.find(key) == KeyBindings.end())
+	auto& list = KeyBindings[key];  
+	InputAction* ptr = &it->second;
+	if (std::find(list.begin(), list.end(), ptr) == list.end())
 	{
-
-		if (it != InputActions.end()) {
-
-			action.push_back(&(it->second));
-			KeyBindings.insert({ key, action });
-		}
-	
+		list.push_back(ptr);
 	}
-	else
-	{
-		if (it != InputActions.end()) {
-
-			KeyBindings.at(key).push_back(&(it->second));
-		}
 		
-	}
 }
 
 void InputMgr::UnBindActionFromKey(sf::Keyboard::Key key, const std::string& actionName)
@@ -122,6 +108,7 @@ void InputMgr::UnBindActionFromKey(sf::Keyboard::Key key, const std::string& act
 	auto& input = keyIt->second;
 
 	input.erase(std::remove(input.begin(), input.end(), &it->second),input.end());
+	if (input.empty()) KeyBindings.erase(keyIt);
 }
 
 

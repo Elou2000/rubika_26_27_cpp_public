@@ -8,13 +8,13 @@ InputAction::InputAction(const std::string& name)
 void InputAction::SetActionName(const std::string& name)
 {
 	ActionName = name;
-	ActionNameHash = name.size();
+	ActionNameHash = std::hash<std::string>{}(name);  
 }
 
 void InputAction::SetValue(float value)
 {
 	Value = value;
-	for (auto callback : Callbacks)
+	for (const auto& callback : Callbacks)    
 	{
 		callback.Callback(Value);
 	}
@@ -29,11 +29,7 @@ void InputAction::RegisterCallback(const std::string& debugName, std::function<v
 
 void InputAction::UnregisterCallbacks(void* owner)
 {
-	for (int i = 0; i < Callbacks.size(); i++) 
-	{
-		if (Callbacks[i].Owner == owner)
-		{
-			Callbacks.erase(Callbacks.begin() + i);
-		}
-	}
+	Callbacks.erase(std::remove_if(Callbacks.begin(), Callbacks.end(),[owner](const sCallbackInfo& info)
+		{ return info.Owner == owner; }),
+		Callbacks.end());
 }
