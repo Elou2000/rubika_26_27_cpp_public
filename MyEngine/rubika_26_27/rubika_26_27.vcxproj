@@ -213,8 +213,11 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="IComponent.cpp" />
     <ClCompile Include="IDrawable.cpp" />
+    <ClCompile Include="InputAction.cpp" />
+    <ClCompile Include="InputMgr.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="StaticRectangle.cpp" />
     <ClCompile Include="RenderComponent.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -245,9 +248,12 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Entity.hxx" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="IComponent.h" />
     <ClInclude Include="IDrawable.h" />
     <ClInclude Include="InputAction.h" />
+    <ClInclude Include="InputMgr.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="RenderComponent.hxx" />
     <ClInclude Include="StaticRectangle.h" />

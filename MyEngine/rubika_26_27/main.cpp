@@ -11,6 +11,9 @@
 #include "TransformComponent.h"
 #include "RenderComponent.h"
 #include "Sprite.h"
+#include "InputMgr.h"
+#include "Player.h"
+#include "SFML/Window.hpp"
 
 void SetUpGame()
 {
@@ -24,13 +27,9 @@ void SetUpGame()
     gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\IsaacSprite.png");
 
     gData.SceneMgr->AddNewScene(new Scene("Base Scene"));
-    Entity* newEntity = new Entity("John Entity");
+    Player* newEntity = new Player("John Entity");
     gData.SceneMgr->sceneList[0]->AddEntityToPool(newEntity);
-    newEntity->AddComponent<TransformComponent>();
     newEntity->AddComponent<RenderComponent>();
-
-    //StaticRectangle* rectangle = newEntity->GetComponent<RenderComponent>()->AddDrawable<StaticRectangle>();
-    //rectangle->SetTextureAndStaticTile("Basement", "Corner_Bottom_Left");
 
     Sprite* sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
     sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Left");
@@ -38,14 +37,19 @@ void SetUpGame()
      sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
     sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Right");
 
+    
+}
 
+void SetUpInputs()
+{
+    
 }
 
 int main()
 {
     gData.Init();
     SetUpGame();
-    
+    SetUpInputs();
 
     sf::RenderWindow window(sf::VideoMode({ 1080, 720 }), "SFML works!", sf::State::Windowed);
 
@@ -102,6 +106,7 @@ int main()
         PROFILER_EVENT_BEGIN(PROFILER_COLOR_GREEN, "Draw");
         window.clear();
         gData.SceneMgr->Update(fDeltaTimeS);
+        gData.InputMgr->Update(fDeltaTimeS);
         gData.SceneMgr->Draw(window);
 #ifdef _USE_IMGUI
         ImGui::SFML::Render(window);
