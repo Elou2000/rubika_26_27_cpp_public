@@ -6,11 +6,15 @@ Player::Player(std::string friendlyName) : Entity(friendlyName)
 { 
     transform = AddComponent<TransformComponent>();  
     AddComponent<RenderComponent>();
-    AddComponent<DynamicColliderComponent>();
-    GetComponent<DynamicColliderComponent>()->SetHitboxSize(sf::Vector2f(18, 12));
+    DynamicColliderComponent* dc = AddComponent<DynamicColliderComponent>();
+    dc->SetHitboxSize(sf::Vector2f(18, 12));
     SetUpInputs();
     transform->SetScale(sf::Vector2f(5, 5));
 
+    dc->SetOnCollisionCallback([](const Entity* other)
+        {
+            return OnCollisionChoice::Block;
+        });
 
      //sprite = GetComponent<RenderComponent>()->AddDrawable<Sprite>();
     //sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Left");

@@ -116,19 +116,34 @@ bool DynamicColliderComponent::IsColliding(sf::FloatRect otherHitbox)
 
 void DynamicColliderComponent::DetectCollisions()
 {
-	for (auto entity : gData.SceneMgr->currentScene->entityList)
+	if (!collisionEnabled || !onCollision) return;
+
+	Entity& owner = GetEntity();
+	auto* transform = owner.GetComponent<TransformComponent>();
+
+	for (Entity* other : gData.SceneMgr->currentScene->entityList)
 	{
-		if (entity != &GetEntity())
-		{
-			if (DynamicColliderComponent* coll = entity->GetComponent<DynamicColliderComponent>())
-			{
-				if (IsColliding(coll->GetWorldHitbox()))
-				{
-					Logger::Info("Detect Collision");
-				}
-			}
-		}
-		
+		if (other == &owner) continue;
+
+		auto* otherColl = other->GetComponent<DynamicColliderComponent>();
+		if (!otherColl || !otherColl->AreCollisionsEnabled()) continue;
+
+		sf::FloatRect myBox = GetWorldHitbox();
+		auto overlap = myBox.findIntersection(otherColl->GetWorldHitbox());
+		if (!overlap) continue;
+
+		if (onCollision(other) != OnCollisionChoice::Block) continue;
+
+	
+		const sf::FloatRect& o = *overlap;
+		sf::Vector2f myCenter = myBox.getCenter();
+		sf::Vector2f otherCenter = otherColl->GetWorldHitbox().getCenter();
+		sf::Vector2f push(0.f, 0.f);
+
+		if (o.size.x < o.size.y) push.x = (myCenter.x < otherCenter.x) ? -o.size.x : o.size.x;
+		else push.y = (myCenter.y < otherCenter.y) ? -o.size.y : o.size.y;
+
+		transform->SetWorldPosition(transform->GetWorldPosition() + push);
 	}
 }
 
@@ -139,13 +154,7 @@ sf::FloatRect DynamicColliderComponent::GetWorldHitbox() const
 	sf::Vector2f position = transform->GetWorldPosition();
 	sf::Vector2f scale = transform->GetScale();
 
-	return sf::FloatRect(
-		hitbox.position + position,
-		sf::Vector2f(
-			hitbox.size.x * scale.x,
-			hitbox.size.y * scale.y
-		)
-	);
+	return sf::FloatRect(hitbox.position + position,sf::Vector2f(hitbox.size.x * scale.x,hitbox.size.y * scale.y));
 }
 
 const sf::FloatRect& DynamicColliderComponent::GetHitbox() const
@@ -155,7 +164,7 @@ const sf::FloatRect& DynamicColliderComponent::GetHitbox() const
 
 void DynamicColliderComponent::SetOnCollisionCallback(std::function<OnCollisionChoice(const Entity*)> callback)
 {
-
+	onCollision = std::move(callback);
 }
 
 void DynamicColliderComponent::ToggleDebugVisual()

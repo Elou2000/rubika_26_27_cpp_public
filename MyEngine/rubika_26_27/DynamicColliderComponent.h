@@ -41,8 +41,10 @@ public:
 
 private:
 	sf::FloatRect hitbox;
-	bool collisionEnabled;
+	bool collisionEnabled = true;
 
-	bool drawDebug;
+	bool drawDebug = false;
 	sf::RectangleShape visualDebug;
+
+	std::function<OnCollisionChoice(const Entity*)> onCollision;
 };
