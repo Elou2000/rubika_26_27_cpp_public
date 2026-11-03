@@ -1,9 +1,15 @@
 #include "Player.h"
+#include "DynamicColliderComponent.h"
 
 Player::Player(std::string friendlyName) : Entity(friendlyName)
 { 
     transform = AddComponent<TransformComponent>();  
+    AddComponent<RenderComponent>();
+    AddComponent<DynamicColliderComponent>();
+    GetComponent<DynamicColliderComponent>()->SetHitboxSize(sf::Vector2f(18, 12));
     SetUpInputs();
+    transform->SetScale(sf::Vector2f(5, 5));
+
 }
 
 void Player::SetUpInputs()
@@ -20,28 +26,28 @@ void Player::SetUpInputs()
         }
         },
        this);
-    //gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Up, "Up");
+  
 
     gData.InputMgr->RegisterToInputAction("Down", "GoDown", [this](float value)
         {if (value != 0)
     {
         Move(Down);
     }; }, this);
-    //gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Down, "Down");
+ 
 
     gData.InputMgr->RegisterToInputAction("Right", "GoRight", [this](float value)
         {if (value != 0)
     {
         Move(Right);
     }; }, this);
-    //gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Right, "Right");
+   
 
     gData.InputMgr->RegisterToInputAction("Left", "GoLeft", [this](float value)
         {if (value != 0)
     {
         Move(Left);
     }; }, this);
-    //gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Left, "Left");
+   
 }
 
 void Player::Move(dir direction)

@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "Logger.h"
+#include "DynamicColliderComponent.h"
 
 
 
@@ -15,6 +16,7 @@ Entity::~Entity()
 
 void Entity::Start()
 {
+	
 	for (auto component : components)
 	{
 		component->Start();
@@ -43,5 +45,17 @@ void Entity::Destroy()
 
 void Entity::Draw(sf::RenderWindow& window) const
 {
-	GetComponent<RenderComponent>()->Draw(window);
+	if (RenderComponent* comp = GetComponent<RenderComponent>())
+	{
+		comp->Draw(window);
+	}
+
+#ifdef _DEBUG
+	if (DynamicColliderComponent* comp = GetComponent<DynamicColliderComponent>())
+	{
+		comp->Draw(window);
+	}
+#endif 
+
+	
 }

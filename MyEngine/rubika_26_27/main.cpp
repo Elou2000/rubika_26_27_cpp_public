@@ -13,6 +13,7 @@
 #include "Sprite.h"
 #include "InputMgr.h"
 #include "Player.h"
+#include "DynamicColliderComponent.h"
 #include "SFML/Window.hpp"
 
 void SetUpGame()
@@ -27,14 +28,16 @@ void SetUpGame()
     gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\IsaacSprite.png");
     
     gData.SceneMgr->AddNewScene(new Scene("Base Scene"));
+
     Player* newEntity = new Player("John Entity");
     gData.SceneMgr->sceneList[0]->AddEntityToPool(newEntity);
-    newEntity->AddComponent<RenderComponent>();
+    
+    
 
     Sprite* sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
-    sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Left");
+    //sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Left");
 
-     sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
+    sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
     sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Right");
 
     
@@ -43,6 +46,7 @@ void SetUpGame()
 void SetUpInputs()
 {
     gData.InputMgr->LoadInputs("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\InputsData.xml");
+   
 }
 
 int main()
