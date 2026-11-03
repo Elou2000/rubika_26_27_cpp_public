@@ -71,3 +71,63 @@ Let's move this hard-coded part to an external file so it can be changed without
     - Don't forget to add a way to identify the type of binding in case later we want to support joysticks, for instance.
 
 ## Threshold 1
+
+Let's focus on the last missing part needed to create a very simple game: collision. In this threshold, we will create a collider component that can be used by our ECS.
+
+### Step 0
+
+Discussion in class to answer architecture questions, flow questions and feature-related questions.
+
+If everything is clear for you at this stage, you can try to implement the input system on your own. Otherwise, you can follow the steps.
+
+### Step 1
+
+To keep things simple, we will assume that an `Entity` can only have a single collider (even if this assumption might evolve in the later steps).
+
+So the first thing we have to create is a component called `DynamicColliderComponent` which inherits from `IComponent`. This component will work as a wrapper around the SFML class `sf::FloatRect`, which provides useful functions to determine whether two `sf::FloatRect` objects intersect or not.
+
+Create the necessary functions to manipulate the rectangle, such as size and offset from the `TransformComponent` (this class doesn't support rotation, which is not optimal, but it will be sufficient in our case).
+
+Finally, add this component to your `Entity` and do everything necessary so that this new component is visible and modifiable through the debug window (even if you cannot check the modifications on the screen yet).
+
+### Step 2
+
+At this stage, we have an invisible rectangle around our entity. However, it is hard to use because you have to dig into your debugger to determine whether everything works well.
+
+To fix this issue, we will create a debug feature to display all hitboxes in a scene.
+
+**Everything we are going to add must only be available in debug mode. That means that you have to implement these features inside MACRO blocks.**
+
+Let's add a simple `sf::RectangleShape` to our component and a `Draw` function. Every modification made to the hitbox itself must be replicated on the `sf::RectangleShape`, so both remain consistent. During the collider's `Draw` function, simply draw the rectangle in the right place.
+
+Then, update the global flow of your engine to draw the `Entity`'s collider at the right time in the flow.
+
+Finally, create a debug variable accessible from anywhere which indicates whether the collider must be drawn or not. Register a debug action in the `DebugMgr` so we have a button to toggle it in our debug window. Now that we have an input system, we can also create an input action and a binding for this feature to make it easier to use.
+
+### Step 3
+
+Before implementing the behavior of our collider, we will need another `Entity` to collide with. We could continue creating custom `Entities` in our main function, but things will become messy very quickly. Let's organize that.
+
+Create a `Player` class which inherits from `Entity` and move its setup into its constructor and its `Start` function. Replace its entire creation and setup in the main function with the creation of a `Player` instance.
+
+Create an `Obstacle` class which also inherits from `Entity` and modify the appropriate functions to set up this class with a `TransformComponent`, a `RenderComponent` with a `RectangleDrawable` and finally a `DynamicColliderComponent`.
+
+Finally, instantiate multiple `Obstacles` at different places in our scene so that our `Player` can interact with them.
+
+### Step 4
+
+Let's focus on the main behavior of our collider: detecting collisions. In this threshold, we will keep the implementation deliberately naive so we can optimize it in the next one.
+
+Iterate over every `Entity`, get its collider if it has one and check whether the two hitboxes collide.
+
+This part is pretty straightforward. The real difficulty comes with the following question: What should we do if two entities collide?
+
+There is no universal answer to this question. You might want to move one to avoid an overlap. You might want to 'destroy' one or the other. You might want to trigger an event...
+
+To solve this problem, we will give the responsibility to the `Entity` itself using a callback. This callback must determine what to do with the collision by returning an enum (which we will limit to two possibilities for now: block or do nothing).
+
+Implement everything necessary to set that callback, then use it at the right time in your function and update the `TransformComponent` position according to its result.
+
+Finally, implement this function on the `Player` side to always return `Block` (we will change that in the next threshold).
+
+At this stage, you should be able to move your `Player` and collide perfectly with the `Obstacles`.
