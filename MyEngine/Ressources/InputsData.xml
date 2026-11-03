@@ -1,0 +1,28 @@
+<InputsData>
+	<InputAction Name="Up">
+		<Key1>25</Key1>
+		<Key2>73</Key2>
+		<JoystickButon></JoystickButon>
+	</InputAction>
+	<InputAction Name="Down">
+		<Key1>18</Key1>
+		<Key2>74</Key2>
+		<JoystickButon></JoystickButon>
+	</InputAction>
+	<InputAction Name="Right">
+		<Key1>3</Key1>
+		<Key2>72</Key2>
+		<JoystickButon></JoystickButon>
+	</InputAction>
+	<InputAction Name="Left">
+		<Key1>16</Key1>
+		<Key2>71</Key2>
+		<JoystickButon></JoystickButon>
+	</InputAction>
+	<InputVector Name="HorizontalVec">
+		<Value>0</Value>
+	</InputVector>
+	<InputVector Name="VerticalVec">
+		<Value>1</Value>
+	</InputVector>
+</InputsData>

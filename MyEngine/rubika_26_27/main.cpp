@@ -25,7 +25,7 @@ void SetUpGame()
     gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\enemy_texture_4.png");
     gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\enemy_texture_5.png");
     gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\IsaacSprite.png");
-
+    
     gData.SceneMgr->AddNewScene(new Scene("Base Scene"));
     Player* newEntity = new Player("John Entity");
     gData.SceneMgr->sceneList[0]->AddEntityToPool(newEntity);
@@ -42,7 +42,7 @@ void SetUpGame()
 
 void SetUpInputs()
 {
-    
+    gData.InputMgr->LoadInputs("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\InputsData.xml");
 }
 
 int main()
@@ -50,6 +50,7 @@ int main()
     gData.Init();
     SetUpGame();
     SetUpInputs();
+    
 
     sf::RenderWindow window(sf::VideoMode({ 1080, 720 }), "SFML works!", sf::State::Windowed);
 

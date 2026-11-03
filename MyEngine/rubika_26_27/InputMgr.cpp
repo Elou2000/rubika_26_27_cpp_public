@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <unordered_map>
+#include <Logger.h>
 
 
 InputMgr::InputMgr()
@@ -68,7 +69,6 @@ const char* InputMgr::KeyToString(sf::Keyboard::Key key)
 		"F15" , "Pause"
 	};
 
-	static_assert(sizeof(names) / sizeof(names[0]) == sf::Keyboard::KeyCount,"Key name table out of sync with sf::Keyboard::Key");
 	int idx = static_cast<int>(key);
 	return (idx >= 0 && idx < sf::Keyboard::KeyCount) ? names[idx] : "Unknown";
 }
@@ -177,9 +177,7 @@ void InputMgr::DrawDebug()
 				ImGui::EndCombo();
 			}
 
-			if (ImGui::Button("Bind"))
-				BindKeyToInputAction(static_cast<sf::Keyboard::Key>(DebugSelectedKey),
-					*names[DebugSelectedAction]);
+			if (ImGui::Button("Bind"))BindKeyToInputAction(static_cast<sf::Keyboard::Key>(DebugSelectedKey),*names[DebugSelectedAction]);
 		}
 	}
 
@@ -230,6 +228,7 @@ void InputMgr::BindKeyToInputAction(sf::Keyboard::Key key, const std::string act
 
 	auto& list = KeyBindings[key];  
 	InputAction* ptr = &it->second;
+	
 	if (std::find(list.begin(), list.end(), ptr) == list.end())
 	{
 		list.push_back(ptr);
@@ -253,8 +252,96 @@ void InputMgr::UnBindActionFromKey(sf::Keyboard::Key key, const std::string& act
 	if (input.empty()) KeyBindings.erase(keyIt);
 }
 
+bool InputMgr::LoadInputs(const std::filesystem::path& path)
+{
+	std::filesystem::path metaPath = path;
+	metaPath.replace_extension(".xml");
+
+	if (!FileExists(metaPath))
+	{
+		Logger::Error("Metadata file not found: " + metaPath.string());
+		return false;
+	}
 
 
+	if (!LoadInputAction(metaPath))
+		return false;
+
+	return true;
+}
+
+bool InputMgr::RegisterKey(const rapidxml::xml_node<>& parent, const char* name)
+{
+	const rapidxml::xml_node<>* child = parent.first_node(name);
+	if (!child)
+	{
+		Logger::Warning(std::string("Missing <") + name + "> node");
+		return false;
+	}
+
+	try
+	{	
+		int key = std::stoi(std::string(child->value(), child->value_size()));
+		BindKeyToInputAction(static_cast<sf::Keyboard::Key>(key), parent.first_attribute("Name")->value());
+		
+	}
+	catch (const std::exception&)
+	{
+		Logger::Warning(std::string("Invalid integer in <") + name + ">");
+		return false;
+	}
+	return true;
+}
+bool InputMgr::FileExists(const std::filesystem::path& path)
+{
+	return std::filesystem::is_regular_file(path) && std::filesystem::exists(path);
+}
+bool InputMgr::LoadInputAction(const std::filesystem::path& metaPath)
+{
+	try
+	{
+		rapidxml::file<> file(metaPath.string().c_str());
+		rapidxml::xml_document<> doc;
+		doc.parse<0>(file.data());
+
+		const rapidxml::xml_node<>* inputAction = doc.first_node("InputsData");
+		const rapidxml::xml_node<>* inputVector = doc.first_node("InputVector");
+
+		if (!inputAction && !inputVector)
+		{
+			Logger::Error("No <InputAction> or <InputVector> root in " + metaPath.string());
+			return false;
+		}
+
+		if (inputAction && !LoadInputKey(*inputAction))
+			return false;
+		//if (inputVector && !LoadInputKey(*inputVector))
+			//return false;
+	}
+	catch (std::string& e)
+	{
+		Logger::Error(std::string("XML parse error in ") + metaPath.string() + ": " + e);
+		return false;
+	}
+
+	return true;
+}
+
+bool InputMgr::LoadInputKey(const rapidxml::xml_node<>& root)
+{
+	for (const rapidxml::xml_node<>* n = root.first_node("InputAction"); n; n = n->next_sibling("InputAction"))
+	{
+		RegisterKey(*n, "Key1");
+		RegisterKey(*n, "Key2");
+		
+	}
+	return true;
+}
+
+bool InputMgr::LoadInputVector(const rapidxml::xml_node<>& root)
+{
+	return false;
+}
 
 
 

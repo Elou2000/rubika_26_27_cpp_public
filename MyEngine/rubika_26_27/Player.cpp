@@ -20,28 +20,28 @@ void Player::SetUpInputs()
         }
         },
        this);
-    gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Up, "Up");
+    //gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Up, "Up");
 
     gData.InputMgr->RegisterToInputAction("Down", "GoDown", [this](float value)
         {if (value != 0)
     {
         Move(Down);
     }; }, this);
-    gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Down, "Down");
+    //gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Down, "Down");
 
     gData.InputMgr->RegisterToInputAction("Right", "GoRight", [this](float value)
         {if (value != 0)
     {
         Move(Right);
     }; }, this);
-    gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Right, "Right");
+    //gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Right, "Right");
 
     gData.InputMgr->RegisterToInputAction("Left", "GoLeft", [this](float value)
         {if (value != 0)
     {
         Move(Left);
     }; }, this);
-    gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Left, "Left");
+    //gData.InputMgr->BindKeyToInputAction(sf::Keyboard::Key::Left, "Left");
 }
 
 void Player::Move(dir direction)
