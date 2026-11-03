@@ -218,6 +218,7 @@
     <ClCompile Include="InputMgr.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="StaticRectangle.cpp" />
     <ClCompile Include="RenderComponent.cpp" />
@@ -255,6 +256,7 @@
     <ClInclude Include="InputAction.h" />
     <ClInclude Include="InputMgr.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="RenderComponent.hxx" />

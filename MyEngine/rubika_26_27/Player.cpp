@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "DynamicColliderComponent.h"
+#include "Sprite.h"
 
 Player::Player(std::string friendlyName) : Entity(friendlyName)
 { 
@@ -9,6 +10,13 @@ Player::Player(std::string friendlyName) : Entity(friendlyName)
     GetComponent<DynamicColliderComponent>()->SetHitboxSize(sf::Vector2f(18, 12));
     SetUpInputs();
     transform->SetScale(sf::Vector2f(5, 5));
+
+
+     //sprite = GetComponent<RenderComponent>()->AddDrawable<Sprite>();
+    //sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Left");
+
+    Sprite* sprite = GetComponent<RenderComponent>()->AddDrawable<Sprite>();
+    sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Right");
 
 }
 

@@ -13,6 +13,7 @@
 #include "Sprite.h"
 #include "InputMgr.h"
 #include "Player.h"
+#include "Obstacle.h"
 #include "DynamicColliderComponent.h"
 #include "SFML/Window.hpp"
 
@@ -29,18 +30,17 @@ void SetUpGame()
     
     gData.SceneMgr->AddNewScene(new Scene("Base Scene"));
 
+    
+    
+    Obstacle* newObstacle = new Obstacle("Obstacle");
+    gData.SceneMgr->sceneList[0]->AddEntityToPool(newObstacle);
+    newObstacle->GetComponent<TransformComponent>()->SetWorldPosition(sf::Vector2f(300, 300));
+    Obstacle* newObstacle2 = new Obstacle("Obstacle2");
+    gData.SceneMgr->sceneList[0]->AddEntityToPool(newObstacle2);
+    newObstacle2->GetComponent<TransformComponent>()->SetWorldPosition(sf::Vector2f(600, 500));
+ 
     Player* newEntity = new Player("John Entity");
     gData.SceneMgr->sceneList[0]->AddEntityToPool(newEntity);
-    
-    
-
-    Sprite* sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
-    //sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Left");
-
-    sprite = newEntity->GetComponent<RenderComponent>()->AddDrawable<Sprite>();
-    sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Right");
-
-    
 }
 
 void SetUpInputs()

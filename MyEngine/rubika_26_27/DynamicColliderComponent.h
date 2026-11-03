@@ -30,7 +30,11 @@ public:
 	void EnableCollision(bool bEnable);
 	bool AreCollisionsEnabled() const;
 
+	bool IsColliding(sf::FloatRect hitbox);
+	void DetectCollisions();
+
 	const sf::FloatRect& GetHitbox() const;
+	sf::FloatRect GetWorldHitbox() const;
 
 	void SetOnCollisionCallback(std::function<OnCollisionChoice(const Entity*)> callback);
 	void ToggleDebugVisual();

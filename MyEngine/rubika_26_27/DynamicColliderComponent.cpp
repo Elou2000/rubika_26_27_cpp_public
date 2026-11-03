@@ -4,6 +4,8 @@
 #include "Entity.h"
 #include "Globals.h"
 #include "InputMgr.h"
+#include "SceneMgr.h"
+#include "Scene.h"
 
 
 
@@ -40,6 +42,8 @@ void DynamicColliderComponent::Update(float fDeltaTime)
 	visualDebug.setFillColor(sf::Color::Transparent);
 	visualDebug.setOutlineThickness(2);
 	visualDebug.setOutlineColor(sf::Color::Green);
+
+	DetectCollisions();
 }
 
 void DynamicColliderComponent::Draw(sf::RenderWindow& window)
@@ -47,7 +51,6 @@ void DynamicColliderComponent::Draw(sf::RenderWindow& window)
 	if (drawDebug)
 	{
 		window.draw(visualDebug);
-
 	}
 	
 }
@@ -104,6 +107,45 @@ void DynamicColliderComponent::EnableCollision(bool bEnable)
 bool DynamicColliderComponent::AreCollisionsEnabled() const
 {
 	return collisionEnabled;
+}
+
+bool DynamicColliderComponent::IsColliding(sf::FloatRect otherHitbox)
+{
+	return GetWorldHitbox().findIntersection(otherHitbox).has_value();
+}
+
+void DynamicColliderComponent::DetectCollisions()
+{
+	for (auto entity : gData.SceneMgr->currentScene->entityList)
+	{
+		if (entity != &GetEntity())
+		{
+			if (DynamicColliderComponent* coll = entity->GetComponent<DynamicColliderComponent>())
+			{
+				if (IsColliding(coll->GetWorldHitbox()))
+				{
+					Logger::Info("Detect Collision");
+				}
+			}
+		}
+		
+	}
+}
+
+sf::FloatRect DynamicColliderComponent::GetWorldHitbox() const
+{
+	const auto* transform = GetEntity().GetComponent<TransformComponent>();
+
+	sf::Vector2f position = transform->GetWorldPosition();
+	sf::Vector2f scale = transform->GetScale();
+
+	return sf::FloatRect(
+		hitbox.position + position,
+		sf::Vector2f(
+			hitbox.size.x * scale.x,
+			hitbox.size.y * scale.y
+		)
+	);
 }
 
 const sf::FloatRect& DynamicColliderComponent::GetHitbox() const
