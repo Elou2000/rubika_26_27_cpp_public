@@ -22,15 +22,42 @@ void InputMgr::Start()
 
 void InputMgr::Update(float fDeltaTime)
 {
-	for (const auto& bindings : KeyBindings) 
+	sf::Joystick::update();
+	std::unordered_map<InputAction*, float> values;
+	for (auto& [hash, action] : InputActions)
+		values[&action] = 0.f;
+
+	for (const auto& [key, actions] : KeyBindings)
+		if (sf::Keyboard::isKeyPressed(key))
+			for (auto* a : actions) values[a] = 1.f;
+
+	for (const auto& b : JoystickBindings)
+		if (sf::Joystick::isConnected(b.JoystickId) &&
+			sf::Joystick::isButtonPressed(b.JoystickId, b.Button))
+			values[b.Action] = 1.f;
+
+	for (const auto& b : JoystickAxisBindings)
 	{
-		const float value = sf::Keyboard::isKeyPressed(bindings.first) ? 1.f : 0.f;
-		for (auto* inputAction : bindings.second)
-		{
-			inputAction->SetValue(value);
-		}
-			
+		if (!sf::Joystick::isConnected(b.JoystickId) ||
+			!sf::Joystick::hasAxis(b.JoystickId, b.Axis))
+			continue;
+
+		constexpr float Deadzone = 0.2f;
+
+		float raw = sf::Joystick::getAxisPosition(b.JoystickId, b.Axis) / 100.f;
+		float mag = std::abs(raw);
+		if (mag < Deadzone) continue;
+
+		float scaled = ((mag - Deadzone) / (1.f - Deadzone)) * (raw < 0.f ? -1.f : 1.f) * b.Direction;
+		float v = std::max(0.f, scaled);
+		if (v <= 0.f) continue;
+
+		float& current = values[b.Action];
+		if (std::abs(v) > std::abs(current)) current = v;
 	}
+
+	for (auto& [action, v] : values)
+		action->SetValue(v);
 }
 
 void InputMgr::Destroy()
@@ -43,8 +70,8 @@ const char* InputMgr::KeyToString(sf::Keyboard::Key key)
 	static const char* names[] = {
 		"A", "B" ,"C" ,
 		"D" , "E" ,"F" , "G" ,
-		"H" , "I" , "J" ," K" ,
-		"L" ," M" , "N" ," O" ,
+		"H" , "I" , "J" ,"K" ,
+		"L" ," M" , "N" ,"O" ,
 		"P" ,"Q" , "R" , "S" ,
 		"T" , "U" , "V" , "W" ,
 		"X" , "Y" , "Z" , "Num0" ,
@@ -207,6 +234,13 @@ void InputMgr::RemoveInputAction(const std::string& name)
 		v.erase(std::remove(v.begin(), v.end(), ptr), v.end());
 	}
 	InputActions.erase(it);
+
+	JoystickBindings.erase(std::remove_if(JoystickBindings.begin(), JoystickBindings.end(),[ptr](const JoystickBinding& b) 
+		{ return b.Action == ptr; }),
+		JoystickBindings.end());
+
+	JoystickAxisBindings.erase(std::remove_if(JoystickAxisBindings.begin(), JoystickAxisBindings.end(),
+		[ptr](const JoystickAxisBinding& b) { return b.Action == ptr; }), JoystickAxisBindings.end());
 }
 
 void InputMgr::RegisterToInputAction(const std::string& actionName, const std::string& debugName, std::function<void(float)> callback, void* owner)
@@ -292,6 +326,35 @@ bool InputMgr::RegisterKey(const rapidxml::xml_node<>& parent, const char* name)
 	}
 	return true;
 }
+bool InputMgr::RegisterJoystickButton(const rapidxml::xml_node<>& parent)
+{
+	const auto* node = parent.first_node("JoystickButton");
+
+	if (!node)
+		return false;
+
+	try
+	{
+		unsigned int button = std::stoi(node->value());
+
+		unsigned int joystickId = 0;
+
+		if (auto* attr = node->first_attribute("JoystickId")) joystickId = std::stoi(attr->value());
+
+		auto* name = parent.first_attribute("Name");
+
+		if (!name) return false;
+
+		BindJoystickButton(joystickId,button,name->value());
+	}
+	catch (...)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 bool InputMgr::FileExists(const std::filesystem::path& path)
 {
 	return std::filesystem::is_regular_file(path) && std::filesystem::exists(path);
@@ -304,19 +367,14 @@ bool InputMgr::LoadInputAction(const std::filesystem::path& metaPath)
 		rapidxml::xml_document<> doc;
 		doc.parse<0>(file.data());
 
-		const rapidxml::xml_node<>* inputAction = doc.first_node("InputsData");
-		const rapidxml::xml_node<>* inputVector = doc.first_node("InputVector");
-
-		if (!inputAction && !inputVector)
+		const rapidxml::xml_node<>* root = doc.first_node("InputsData");
+		if (!root)
 		{
-			Logger::Error("No <InputAction> or <InputVector> root in " + metaPath.string());
+			Logger::Error("No <InputsData> root in " + metaPath.string());
 			return false;
 		}
 
-		if (inputAction && !LoadInputKey(*inputAction))
-			return false;
-		//if (inputVector && !LoadInputKey(*inputVector))
-			//return false;
+		if (!LoadInputKey(*root)) return false;
 	}
 	catch (std::string& e)
 	{
@@ -333,14 +391,99 @@ bool InputMgr::LoadInputKey(const rapidxml::xml_node<>& root)
 	{
 		RegisterKey(*n, "Key1");
 		RegisterKey(*n, "Key2");
-		
+		RegisterJoystickButton(*n);
+		RegisterJoystickAxis(*n);
 	}
 	return true;
 }
 
-bool InputMgr::LoadInputVector(const rapidxml::xml_node<>& root)
+
+void InputMgr::BindJoystickButton(unsigned int joystickId,unsigned int button,const std::string& actionName)
 {
-	return false;
+	auto it = InputActions.find(std::hash<std::string>{}(actionName));
+
+	if (it == InputActions.end())
+		return;
+
+	InputAction* action = &it->second;
+
+	auto existing = std::find_if(JoystickBindings.begin(),JoystickBindings.end(),[&](const JoystickBinding& binding)
+		{
+			return binding.JoystickId == joystickId && binding.Button == button &&binding.Action == action;
+		}
+	);
+
+	if (existing == JoystickBindings.end())
+	{
+		JoystickBindings.push_back({joystickId,button,action});
+	}
+}
+
+void InputMgr::UnBindJoystickButton(unsigned int joystickId, unsigned int button, const std::string& actionName)
+{
+}
+
+InputAction* InputMgr::FindAction(const std::string& name)
+{
+	auto it = InputActions.find(std::hash<std::string>{}(name));
+	return it != InputActions.end() ? &it->second : nullptr;
+}
+
+bool InputMgr::AxisFromString(const std::string& s, sf::Joystick::Axis& out)
+{
+	static const std::unordered_map<std::string, sf::Joystick::Axis> map = {
+		{"X", sf::Joystick::Axis::X}, {"Y", sf::Joystick::Axis::Y}, {"Z", sf::Joystick::Axis::Z},
+		{"R", sf::Joystick::Axis::R}, {"U", sf::Joystick::Axis::U}, {"V", sf::Joystick::Axis::V},
+		{"PovX", sf::Joystick::Axis::PovX}, {"PovY", sf::Joystick::Axis::PovY}
+	};
+	auto it = map.find(s);
+	if (it == map.end()) return false;
+	out = it->second;
+	return true;
+}
+
+
+void InputMgr::BindJoystickAxis(unsigned int joystickId, sf::Joystick::Axis axis, float direction, const std::string& actionName)
+{
+	InputAction* action = FindAction(actionName);
+	if (!action) return;
+
+	JoystickAxisBindings.push_back({ joystickId, axis, direction, action });
+}
+
+
+bool InputMgr::RegisterJoystickAxis(const rapidxml::xml_node<>& parent)
+{
+	auto* name = parent.first_attribute("Name");
+	if (!name) return false;
+
+	for (const auto* a = parent.first_node("JoystickAxis"); a; a = a->next_sibling("JoystickAxis"))
+	{
+		unsigned int joystickId = 0;
+		float direction = 1.f;
+		sf::Joystick::Axis axis;
+
+		try
+		{
+			if (auto* at = a->first_attribute("JoystickId")) joystickId = std::stoul(at->value());
+			if (auto* at = a->first_attribute("Direction"))  direction = std::stoi(at->value()) < 0 ? -1.f : 1.f;
+		}
+		catch (const std::exception&)
+		{
+			Logger::Warning("Invalid <JoystickAxis> attribute");
+			continue;
+		}
+
+		auto* axisAttr = a->first_attribute("Axis");
+		if (!axisAttr || !AxisFromString(axisAttr->value(), axis))
+		{
+			Logger::Warning("Unknown or missing Axis in <JoystickAxis>");
+			continue;
+		}
+
+		BindJoystickAxis(joystickId, axis, direction, name->value());
+	}
+	return true;
 }
 
 
