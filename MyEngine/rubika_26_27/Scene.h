@@ -23,6 +23,8 @@ public:
 	void RemoveEntityFromPool(Entity*);
 
 	std::vector<Entity*> entityList;
+	std::vector<Entity*> staticEntityList;
+	std::vector<Entity*> dynamicEntityList;
 
 	std::string sceneName;
 

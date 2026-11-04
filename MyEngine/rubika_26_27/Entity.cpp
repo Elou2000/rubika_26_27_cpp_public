@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include "Logger.h"
 #include "DynamicColliderComponent.h"
+#include "SceneMgr.h"
 
 
 
@@ -45,11 +46,35 @@ void Entity::Destroy()
 void Entity::AddTag(unsigned int tag)
 {
 	m_Tags |= tag;
+	auto* currentScene = gData.SceneMgr->currentScene;
+	if (tag == ENTITY_TAG_STATIC 
+		&& std::find(currentScene->staticEntityList.begin(), currentScene->staticEntityList.end(), this) != currentScene->staticEntityList.end())
+	{
+		currentScene->staticEntityList.push_back(this);
+	}
+	if (tag == ENTITY_TAG_DYNAMIC
+		&& std::find(currentScene->dynamicEntityList.begin(), currentScene->dynamicEntityList.end(), this) != currentScene->dynamicEntityList.end()) {
+
+		currentScene->dynamicEntityList.push_back(this);
+	}
+	
 }
 
 void Entity::RemoveTag(unsigned int tag)
 {
 	m_Tags &= ~tag;
+	auto* currentScene = gData.SceneMgr->currentScene;
+	if (tag == ENTITY_TAG_STATIC)
+	{
+		currentScene->staticEntityList.erase(std::remove(currentScene->staticEntityList.begin(), currentScene->staticEntityList.end(), this), currentScene->staticEntityList.end());
+	}
+	else if (tag == ENTITY_TAG_DYNAMIC)
+	{
+		currentScene->dynamicEntityList.erase(std::remove(currentScene->dynamicEntityList.begin(), currentScene->dynamicEntityList.end(), this), currentScene->dynamicEntityList.end());
+	}
+
+		
+	
 }
 
 bool Entity::HasTag(unsigned int tag) const

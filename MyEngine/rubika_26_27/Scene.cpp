@@ -46,6 +46,14 @@ void Scene::AddEntityToPool(Entity* entityToAdd)
 {
 	entityList.push_back(entityToAdd);
 	entityToAdd->Start();
+	if (entityToAdd->HasTag(ENTITY_TAG_DYNAMIC))
+	{
+		dynamicEntityList.push_back(entityToAdd);
+	}
+	else if (entityToAdd->HasTag(ENTITY_TAG_STATIC))
+	{
+		dynamicEntityList.push_back(entityToAdd);
+	}
 }
 
 void Scene::RemoveEntityFromPool(Entity* entityToRemove)
@@ -58,3 +66,5 @@ void Scene::RemoveEntityFromPool(Entity* entityToRemove)
 		entityList.erase(it);
 	}
 }
+
+
