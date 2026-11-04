@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Profiler.h"
 #include <string>
 
 #ifdef _USE_IMGUI

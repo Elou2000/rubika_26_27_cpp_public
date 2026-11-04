@@ -42,6 +42,26 @@ void Entity::Destroy()
 	
 }
 
+void Entity::AddTag(unsigned int tag)
+{
+	m_Tags |= tag;
+}
+
+void Entity::RemoveTag(unsigned int tag)
+{
+	m_Tags &= ~tag;
+}
+
+bool Entity::HasTag(unsigned int tag) const
+{
+	return tag != ENTITY_TAG_NONE && (m_Tags & tag) == tag;
+}
+
+unsigned int Entity::GetTags() const
+{
+	return m_Tags;
+}
+
 
 void Entity::Draw(sf::RenderWindow& window) const
 {

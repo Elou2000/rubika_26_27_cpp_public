@@ -17,8 +17,11 @@ Obstacle::Obstacle(std::string name) : Entity(name)
     
     DynamicColliderComponent* dc = AddComponent<DynamicColliderComponent>();
     dc->SetHitboxSize(sf::Vector2f(50, 50));
+    dc->SetCollisionFilterMask(ENTITY_TAG_PLAYER);
 
+    dc->SetCollisionFilterMode(CollisionFilterMode::Any);
 
+    AddTag(ENTITY_TAG_STATIC);
 }
 
 Obstacle::~Obstacle()

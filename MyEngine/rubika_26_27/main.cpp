@@ -31,13 +31,15 @@ void SetUpGame()
     gData.SceneMgr->AddNewScene(new Scene("Base Scene"));
 
     
+    for (int i = 0; i < 5; i++) {
+        Obstacle* newObstacle = new Obstacle("Obstacle");
+        gData.SceneMgr->sceneList[0]->AddEntityToPool(newObstacle);
+        newObstacle->GetComponent<TransformComponent>()->SetWorldPosition(sf::Vector2f(300 + i*100, 300));
+    }
     
-    Obstacle* newObstacle = new Obstacle("Obstacle");
-    gData.SceneMgr->sceneList[0]->AddEntityToPool(newObstacle);
-    newObstacle->GetComponent<TransformComponent>()->SetWorldPosition(sf::Vector2f(300, 300));
-    Obstacle* newObstacle2 = new Obstacle("Obstacle2");
-    gData.SceneMgr->sceneList[0]->AddEntityToPool(newObstacle2);
-    newObstacle2->GetComponent<TransformComponent>()->SetWorldPosition(sf::Vector2f(600, 500));
+    //Obstacle* newObstacle2 = new Obstacle("Obstacle2");
+    //gData.SceneMgr->sceneList[0]->AddEntityToPool(newObstacle2);
+    //newObstacle2->GetComponent<TransformComponent>()->SetWorldPosition(sf::Vector2f(600, 500));
  
     Player* newEntity = new Player("John Entity");
     gData.SceneMgr->sceneList[0]->AddEntityToPool(newEntity);

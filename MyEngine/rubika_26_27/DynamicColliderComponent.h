@@ -6,6 +6,13 @@
 #include <functional>
 #include <RenderComponent.h>
 
+
+enum CollisionFilterMode
+{
+	Any,
+	All
+};
+
 enum class OnCollisionChoice
 {
 	Ignore,
@@ -15,6 +22,9 @@ enum class OnCollisionChoice
 class DynamicColliderComponent : public IComponent
 {
 public:
+	
+
+
 	DynamicColliderComponent(Entity& entity);
 	~DynamicColliderComponent();
 
@@ -29,6 +39,9 @@ public:
 
 	void EnableCollision(bool bEnable);
 	bool AreCollisionsEnabled() const;
+	void SetCollisionFilterMask(unsigned int mask);
+	void SetCollisionFilterMode(CollisionFilterMode mode);
+	bool PassesCollisionFilter(const Entity* other) const;
 
 	bool IsColliding(sf::FloatRect hitbox);
 	void DetectCollisions();
@@ -47,4 +60,7 @@ private:
 	sf::RectangleShape visualDebug;
 
 	std::function<OnCollisionChoice(const Entity*)> onCollision;
+	
+	unsigned int collisionFilterMask;
+	CollisionFilterMode collisionFilterMode = CollisionFilterMode::Any;
 };

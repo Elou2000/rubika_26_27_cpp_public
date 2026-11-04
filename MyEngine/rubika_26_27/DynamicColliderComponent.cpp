@@ -34,8 +34,11 @@ void DynamicColliderComponent::Start()
 
 }
 
+
 void DynamicColliderComponent::Update(float fDeltaTime)
 {
+	PROFILER_EVENT_BEGIN(PROFILER_COLOR_GREEN, "Update Collider Component");
+
 	Entity& owner = GetEntity();
 	visualDebug.setPosition(hitbox.position + owner.GetComponent<TransformComponent>()->GetWorldPosition());
 	visualDebug.setSize(sf::Vector2f(hitbox.size.x * owner.GetComponent<TransformComponent>()->GetScale().x, hitbox.size.y * owner.GetComponent<TransformComponent>()->GetScale().y));
@@ -44,6 +47,7 @@ void DynamicColliderComponent::Update(float fDeltaTime)
 	visualDebug.setOutlineColor(sf::Color::Green);
 
 	DetectCollisions();
+	PROFILER_EVENT_END();
 }
 
 void DynamicColliderComponent::Draw(sf::RenderWindow& window)
@@ -109,6 +113,35 @@ bool DynamicColliderComponent::AreCollisionsEnabled() const
 	return collisionEnabled;
 }
 
+void DynamicColliderComponent::SetCollisionFilterMask(unsigned int mask)
+{
+	collisionFilterMask = mask;
+}
+
+void DynamicColliderComponent::SetCollisionFilterMode(CollisionFilterMode mode)
+{
+	collisionFilterMode = mode;
+}
+
+bool DynamicColliderComponent::PassesCollisionFilter(const Entity* other) const
+{
+	if (collisionFilterMask == ENTITY_TAG_NONE)
+		return false;
+
+	switch (collisionFilterMode)
+	{
+	case CollisionFilterMode::Any:
+		return (other->GetTags() & collisionFilterMask) != 0;
+
+	case CollisionFilterMode::All:
+		return (other->GetTags() & collisionFilterMask) == collisionFilterMask;
+	}
+
+	return false;
+}
+
+
+
 bool DynamicColliderComponent::IsColliding(sf::FloatRect otherHitbox)
 {
 	return GetWorldHitbox().findIntersection(otherHitbox).has_value();
@@ -127,6 +160,8 @@ void DynamicColliderComponent::DetectCollisions()
 
 		auto* otherColl = other->GetComponent<DynamicColliderComponent>();
 		if (!otherColl || !otherColl->AreCollisionsEnabled()) continue;
+
+		if (!PassesCollisionFilter(other))continue;
 
 		sf::FloatRect myBox = GetWorldHitbox();
 		auto overlap = myBox.findIntersection(otherColl->GetWorldHitbox());

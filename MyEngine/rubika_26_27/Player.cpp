@@ -16,11 +16,17 @@ Player::Player(std::string friendlyName) : Entity(friendlyName)
             return OnCollisionChoice::Block;
         });
 
+    dc->SetCollisionFilterMask(ENTITY_TAG_STATIC | ENTITY_TAG_ENEMY);
+
+    dc->SetCollisionFilterMode(CollisionFilterMode::Any);
+
      //sprite = GetComponent<RenderComponent>()->AddDrawable<Sprite>();
     //sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Left");
 
     Sprite* sprite = GetComponent<RenderComponent>()->AddDrawable<Sprite>();
     sprite->SetTextureAndAnimationData("IsaacSprite", "Body_Right");
+
+    AddTag(ENTITY_TAG_PLAYER | ENTITY_TAG_DYNAMIC);
 
 }
 
