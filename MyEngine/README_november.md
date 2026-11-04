@@ -131,3 +131,100 @@ Implement everything necessary to set that callback, then use it at the right ti
 Finally, implement this function on the `Player` side to always return `Block` (we will change that in the next threshold).
 
 At this stage, you should be able to move your `Player` and collide perfectly with the `Obstacles`.
+
+## Threshold 2
+
+In this Threshold, we are going to optimize our collision system to make it much more efficient.
+
+### Step 0
+
+Let's start by visualizing how bad our algorithm is. To do so, surround the execution of the `Update` function of each component, especially those of your `Player`, with profiling macros that you can find in `Profiler.h` (as I did in the main function). Using those macros, you can visualize the timings in [PIX](https://devblogs.microsoft.com/pix/download/). The entire project is already configured to work with PIX, so you just need to download it.
+
+Make several captures of your engine as you increase the number of `Obstacles` in your scene (10, 100, 1000, 1000000...).
+
+**Hints**
+
+Follow these guidelines to capture execution information through PIX:
+
+1. Run your game engine.
+2. In PIX, select the executable to attach to through the `Select Target Process` window and the `Attach` section.
+3. Once you have found the correct executable, click on `Attach` (uncheck the GPU Capture button).
+4. PIX is now attached to the executable. You can start a capture by clicking on the `Start Timing Capture` button.
+5. After a few seconds, stop the capture by clicking on the same button.
+
+Here is the online [documentation](https://devblogs.microsoft.com/pix/timing-captures-new/) about PIX if you want to know more.
+
+The different events shown in the PIX capture are sent through `PROFILER_EVENT_BEGIN` and `PROFILER_EVENT_MACRO` (as well as their color and text). Feel free to add new events to your code so you can actually see them in your capture.
+
+### Step 1
+
+Discussion in class to answer architecture questions, flow questions, and feature-related questions.
+
+If everything is clear to you at this stage, you can try to implement the input system on your own. Otherwise, you can follow the steps.
+
+### Step 2
+
+Let's create a static tag system to qualify our colliders/entities. To do so, let's create the following flags using defines (we could also use an enum or enum class to do the same thing).
+
+```cpp
+#define ENTITY_TAG_NONE			0
+#define ENTITY_TAG_STATIC		1 << 0
+#define ENTITY_TAG_DYNAMIC		1 << 1
+#define ENTITY_TAG_NEUTRAL		1 << 2
+#define ENTITY_TAG_ENEMY		1 << 3
+#define ENTITY_TAG_PLAYER		1 << 4
+```
+Each flag **must** equal a different power of two; otherwise, you will get conflicts. Feel free to add new flags or modify these ones according to your needs.
+
+Create a variable large enough to store every combination of flags in your `Entity`, as well as functions to add a new tag (or a combination of tags), remove tag(s), and finally, a `HasTag` function that returns true if the given tag (or combination of tags) is set (we could also add a function that checks if at least one flag of the combination is set). **Those functions must use bitwise operations**.
+
+### Step 3
+
+We can now filter the `Entities` our collider will interact with using those tags. Add a function `SetCollisionFilterMask` to the `DynamicColliderComponent` that will use that data to determine which `Entities` it can collide with. We will add two collision modes using those tags: either at least one of the given flags is required to collide, or the entire combination is required to collide. Add the appropriate setter to the `DynamicColliderComponent` to allow switching between the filter modes and choose one by default. Modify the behavior of the `DynamicColliderComponent` to reflect the two features we have just discussed.
+
+Set the appropriate flags for the `Player` class and the `Obstacle` class.
+
+### Step 4
+
+Filtering dynamic `Entities` is (a bit) faster, but still too slow in our case, even if the `Player` is the only dynamic `Entity`. Indeed, we still look through the entire list of `Entities` to find the right ones, which can take a long time.
+
+Let's add some caches to reduce that time. We are going to add two new containers to the `Scene` to keep track of which `Entities` have the static tag and which ones have the dynamic tag. **Those new containers do not contain the `Entities` themselves, but only a reference/pointer/handle to them. They are not responsible for their creation/destruction, even though they must remain consistent with the entities list**. Modify the `AddEntity` function in the `Scene` to update those new containers. Furthermore, modify the `AddTag`/`RemoveTag` functions in case those flags change.
+
+We now have several lists that we can use to improve our collision system's speed.
+
+### Step 5
+
+We now have good performance when colliding with dynamic `Entities` (because we only have a few), but collisions with static `Entities` are still slow. Let's organize our cache.
+
+Create a `GridEntityCache` class that will store `Entities` in a grid according to their position. Let's start by creating methods to configure the grid as needed (position range, cell size, etc.). Once those parameters are known, we can create the grid accordingly.
+
+Create an `AddEntity` function that will add the `Entity` to the appropriate cells according to its position and the size of its collider. Check every corner and border of the collider to determine all the affected cells. Also create the `RemoveEntity` function.
+
+Create a `GetEntities` function that takes a position as a parameter and returns all the entities inside the same cell as the given position (**do not return a container to avoid copying; instead, modify one provided as a parameter**). Create another `GetEntities` function that takes the collider rectangle instead of a position. This function must return the contents of all cells overlapped by the rectangle (check the borders and corners).
+
+Replace the two containers created during the previous step with the `GridEntityCache` and use it in the collision detection to speed everything up. Add all entities to this container as well to gain some performance when there is no filter.
+
+### Step 6 (Going further)
+
+Depending on our constraints, we could use another organization system. Let's try another one.
+
+Create a `QuadTreeEntityCache` that will store `Entities` in a quad tree according to their position. Let's start by creating methods to configure it as needed (position range, maximum tree depth, maximum number of elements per leaf).
+
+Let's start simple by adding all `Entities` first and then building the tree. Create an `AddEntity` function that will check whether the tree has been created or not. If it has not, store the `Entity` in a temporary container. We will deal with the other case later.
+
+Create the `BuildTree` function that will create the tree based on the previously configured parameters and the entities' positions:
+
+- Split the scene into 4 rectangles using the middle point.
+- Count the number of elements in each rectangle. If it is smaller than the maximum number of elements allowed per leaf, stop here. Otherwise, if the maximum tree depth has been reached, stop here. Otherwise, split the rectangle into 4 smaller rectangles and start again.
+
+Create the `AddEntity`/`RemoveEntity` functions that should work with an existing tree.
+
+Create a `GetEntities` function that takes a position as a parameter and returns all the entities inside the same node as the given position (**do not return a container to avoid copying; instead, modify one provided as a parameter**). Create another `GetEntities` function that takes the collider rectangle instead of a position. This function must return the contents of all nodes overlapped by the rectangle (check the borders and corners).
+
+Add a switch (at compilation time or runtime) to choose which method we are going to use to organize our cache.
+
+### Step 7 (Going further)
+
+Should we add a debug visualization to display the grid/quad tree distribution?
+
+Create a custom ImGui component to display it.
