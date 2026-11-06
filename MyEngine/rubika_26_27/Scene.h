@@ -2,6 +2,9 @@
 #include <string>
 #include "Entity.h"
 #include <vector>
+#include "DynamicColliderComponent.h"
+#include "GridEntityCache.h"
+
 
 namespace sf
 {
@@ -21,10 +24,16 @@ public:
 
 	void AddEntityToPool(Entity*);
 	void RemoveEntityFromPool(Entity*);
+	void ManageCollisions();
+	void ResolveAgainst(Entity* mover, DynamicColliderComponent* moverColl, const std::vector<Entity*>& candidates);
+
+	void SetupGrid(const sf::FloatRect& bounds, const sf::Vector2f& cellSize);
 
 	std::vector<Entity*> entityList;
-	std::vector<Entity*> staticEntityList;
-	std::vector<Entity*> dynamicEntityList;
+	//std::vector<Entity*> staticEntityList;
+	GridEntityCache dynamicGrid;
+	GridEntityCache staticGrid;
+	bool debugGrid = false;
 
 	std::string sceneName;
 

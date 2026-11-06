@@ -29,12 +29,13 @@ void SetUpGame()
     gData.TextureMgr->LoadTexture("C:\\Users\\e.betremieux\\Documents\\GitHub\\rubika_26_27_cpp_public\\MyEngine\\Ressources\\IsaacSprite.png");
     
     gData.SceneMgr->AddNewScene(new Scene("Base Scene"));
+    gData.SceneMgr->sceneList[0]->SetupGrid(sf::FloatRect({ 0.f, 0.f }, { 4000.f, 4000.f }), sf::Vector2f(64.f, 64.f));
 
     
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 10; i++) {
         Obstacle* newObstacle = new Obstacle("Obstacle");
+        newObstacle->GetComponent<TransformComponent>()->SetWorldPosition(sf::Vector2f(100 + i * 200,  i * 100));
         gData.SceneMgr->sceneList[0]->AddEntityToPool(newObstacle);
-        newObstacle->GetComponent<TransformComponent>()->SetWorldPosition(sf::Vector2f(300 + i*100, 300));
     }
     
     //Obstacle* newObstacle2 = new Obstacle("Obstacle2");
@@ -98,7 +99,9 @@ int main()
 
         PROFILER_EVENT_BEGIN(PROFILER_COLOR_RED, "Update");
 #ifdef _USE_IMGUI
+        PROFILER_EVENT_BEGIN(PROFILER_COLOR_RED, "UPDATE SFML");
         ImGui::SFML::Update(window, imGuiTime);
+        PROFILER_EVENT_END();
        
 #endif
 

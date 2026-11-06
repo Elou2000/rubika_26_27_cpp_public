@@ -1,4 +1,5 @@
 #include "DebugMgr.h"
+#include "Profiler.h"
 
 #ifdef _USE_IMGUI
 #include <Imgui/imgui.h>
@@ -6,6 +7,7 @@
 
 void DebugMgr::Draw()
 {
+	
 #ifdef _USE_IMGUI
 	if (ImGui::Begin("Debug"))
 	{

@@ -138,6 +138,11 @@ void SceneMgr::DrawDebug()
 			}
 		}
 		ImGui::SameLine();
+		if (ImGui::Button("Toggle Grid"))
+		{
+			currentInspectedScene->debugGrid = !currentInspectedScene->debugGrid;
+		}
+		ImGui::SameLine();
 		if (ImGui::Button("Back"))
 		{
 			currentCursorPos = 0;

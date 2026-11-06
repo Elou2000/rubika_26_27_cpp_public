@@ -31,31 +31,24 @@ DynamicColliderComponent::~DynamicColliderComponent()
 
 void DynamicColliderComponent::Start()
 {
-
+	visualDebug.setFillColor(sf::Color::Transparent);
+	visualDebug.setOutlineThickness(2);
+	visualDebug.setOutlineColor(sf::Color::Green);
 }
 
 
 void DynamicColliderComponent::Update(float fDeltaTime)
 {
-	PROFILER_EVENT_BEGIN(PROFILER_COLOR_GREEN, "Update Collider Component");
-
-	Entity& owner = GetEntity();
-	visualDebug.setPosition(hitbox.position + owner.GetComponent<TransformComponent>()->GetWorldPosition());
-	visualDebug.setSize(sf::Vector2f(hitbox.size.x * owner.GetComponent<TransformComponent>()->GetScale().x, hitbox.size.y * owner.GetComponent<TransformComponent>()->GetScale().y));
-	visualDebug.setFillColor(sf::Color::Transparent);
-	visualDebug.setOutlineThickness(2);
-	visualDebug.setOutlineColor(sf::Color::Green);
-
-	DetectCollisions();
-	PROFILER_EVENT_END();
+	
 }
 
 void DynamicColliderComponent::Draw(sf::RenderWindow& window)
 {
-	if (drawDebug)
-	{
-		window.draw(visualDebug);
-	}
+	if (!drawDebug) return;
+	sf::FloatRect box = GetWorldHitbox();
+	visualDebug.setPosition(box.position);
+	visualDebug.setSize(box.size);
+	window.draw(visualDebug);
 	
 }
 
@@ -147,40 +140,6 @@ bool DynamicColliderComponent::IsColliding(sf::FloatRect otherHitbox)
 	return GetWorldHitbox().findIntersection(otherHitbox).has_value();
 }
 
-void DynamicColliderComponent::DetectCollisions()
-{
-	if (!collisionEnabled || !onCollision) return;
-
-	Entity& owner = GetEntity();
-	auto* transform = owner.GetComponent<TransformComponent>();
-
-	for (Entity* other : gData.SceneMgr->currentScene->entityList)
-	{
-		if (other == &owner) continue;
-
-		auto* otherColl = other->GetComponent<DynamicColliderComponent>();
-		if (!otherColl || !otherColl->AreCollisionsEnabled()) continue;
-
-		if (!PassesCollisionFilter(other))continue;
-
-		sf::FloatRect myBox = GetWorldHitbox();
-		auto overlap = myBox.findIntersection(otherColl->GetWorldHitbox());
-		if (!overlap) continue;
-
-		if (onCollision(other) != OnCollisionChoice::Block) continue;
-
-	
-		const sf::FloatRect& o = *overlap;
-		sf::Vector2f myCenter = myBox.getCenter();
-		sf::Vector2f otherCenter = otherColl->GetWorldHitbox().getCenter();
-		sf::Vector2f push(0.f, 0.f);
-
-		if (o.size.x < o.size.y) push.x = (myCenter.x < otherCenter.x) ? -o.size.x : o.size.x;
-		else push.y = (myCenter.y < otherCenter.y) ? -o.size.y : o.size.y;
-
-		transform->SetWorldPosition(transform->GetWorldPosition() + push);
-	}
-}
 
 sf::FloatRect DynamicColliderComponent::GetWorldHitbox() const
 {

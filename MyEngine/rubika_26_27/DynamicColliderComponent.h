@@ -44,13 +44,16 @@ public:
 	bool PassesCollisionFilter(const Entity* other) const;
 
 	bool IsColliding(sf::FloatRect hitbox);
-	void DetectCollisions();
+
 
 	const sf::FloatRect& GetHitbox() const;
 	sf::FloatRect GetWorldHitbox() const;
 
 	void SetOnCollisionCallback(std::function<OnCollisionChoice(const Entity*)> callback);
 	void ToggleDebugVisual();
+
+	bool HasCollisionCallback() const { return static_cast<bool>(onCollision); }
+	OnCollisionChoice NotifyCollision(const Entity* other) const { return onCollision(other); }
 
 private:
 	sf::FloatRect hitbox;
